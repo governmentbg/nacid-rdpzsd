@@ -1,0 +1,53 @@
+<div class="table-scrollable mt-4">
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th class="col-3">{{ 'rdpzsd.personLot.personLotAction.actionDate' | translate }}</th>
+                <th class="col-4">{{ 'nomenclature.institution.title' | translate }}</th>
+                <th class="col-5">{{ 'rdpzsd.personLot.personLotAction.actionType' | translate }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngIf="!loadingData; else loadingSection">
+                <tr *ngFor="let personLotActionDto of personLotActionDtos">
+                    <td>
+                        <div>
+                            {{ personLotActionDto.personLotAction.actionDate | date: 'dd.MM.yyyy hh:mm' }}
+                        </div>
+                        <div>
+                            {{ personLotActionDto.personLotAction.userFullname }}
+                        </div>
+                        <div *ngIf="personLotActionDto.userType?.indexOf('rsdUser') !== -1">
+                            <a href="mailto:{{ personLotActionDto.userEmail }}">
+                                {{ personLotActionDto.userEmail }}
+                            </a>
+                        </div>
+                    </td>
+                    <td>
+                        <div *ngIf="personLotActionDto.personLotAction?.institutionId">
+                            {{personLotActionDto.personLotAction?.institution?.name}}
+                        </div>
+                        <div *ngIf="personLotActionDto.personLotAction?.subordinateId">
+                            {{personLotActionDto.personLotAction?.subordinate?.name}}
+                        </div>
+                    </td>
+                    <td>
+                        {{ 'enums.personLotActionType.' +
+                        personLotActionType[personLotActionDto.personLotAction?.actionType] | translate }}
+                        <span *ngIf="personLotActionDto.personLotAction?.note"> -
+                            {{personLotActionDto.personLotAction?.note}}
+                        </span>
+                    </td>
+                </tr>
+            </ng-container>
+            <ng-template #loadingSection>
+                <tr>
+                    <td colspan="3"
+                        class="col-12">
+                        <loading-section></loading-section>
+                    </td>
+                </tr>
+            </ng-template>
+        </tbody>
+    </table>
+</div>

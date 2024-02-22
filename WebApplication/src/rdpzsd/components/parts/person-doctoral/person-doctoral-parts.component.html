@@ -1,0 +1,33 @@
+<div class="d-flex flex-row-reverse mt-4"
+     *ngIf="personLotId
+      && configuration.enableFullFunctionality
+      && personLotState === lotState.actual
+      && userDataService.isRsdUser()
+      && !loadingData
+      && userDataService.userData?.institution?.hasDoctoral
+      && !currentPersonContext.isInEdit">
+    <sync-button btnClass="btn btn-primary btn-sm"
+                 text="root.buttons.add"
+                 [click]="addPart"
+                 [clickContext]="this"
+                 icon="fas fa-plus fa-sm">
+    </sync-button>
+</div>
+
+<ng-container *ngIf="!loadingData; else loadingSection">
+    <ng-template ngFor
+                 let-part
+                 [ngForOf]="parts"
+                 let-i="index">
+        <div class="mt-4">
+            <person-doctoral-part [part]="part"
+                                  [personLotId]="personLotId"
+                                  [personLotState]="personLotState"
+                                  (partRemovedEvent)="removePart(i)">
+            </person-doctoral-part>
+        </div>
+    </ng-template>
+</ng-container>
+<ng-template #loadingSection>
+    <loading-section></loading-section>
+</ng-template>

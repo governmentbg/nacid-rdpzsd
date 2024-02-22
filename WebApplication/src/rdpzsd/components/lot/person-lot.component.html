@@ -1,0 +1,77 @@
+<div class="container">
+    <ng-container *ngIf="!loadingData">
+        <person-lot-info></person-lot-info>
+
+        <lot-actions [personLotId]="personLot.id"
+                     [personLotState]="personLot.state"
+                     [personLotCreateUserId]="personLot.createUserId"></lot-actions>
+
+        <div
+             *ngIf="personLot.state !== lotState.pendingApproval && personLot.state !== lotState.cancelApproval && personLot.state !== lotState.missingPassportCopy; else onlyPersonBasic">
+            <nav ngbNav
+                 #nav="ngbNav"
+                 [(activeId)]="activeTab"
+                 class="nav-tabs mt-4 ">
+                <ng-container ngbNavItem="Basic"
+                              [disabled]="currentPersonContextService.isInEdit">
+                    <a ngbNavLink>{{ 'rdpzsd.personLot.tabs.basic' | translate }}</a>
+                    <ng-template ngbNavContent>
+                        <person-basic-part [personLotId]="personLot.id"
+                                           [(personLotState)]="personLot.state"
+                                           [personLotCreateUserId]="personLot.createUserId"></person-basic-part>
+                    </ng-template>
+                </ng-container>
+                <ng-container ngbNavItem="Secondary"
+                              [disabled]="currentPersonContextService.isInEdit">
+                    <a ngbNavLink>{{ 'rdpzsd.personLot.tabs.secondary' | translate }}
+                        <i *ngIf="!currentPersonContextService.isInEdit && personSecondaryFromRso !== null && !personSecondaryFromRso"
+                           class="fas fa-exclamation-triangle ms-2 text-orange"
+                           ngbTooltip="{{ 'rdpzsd.personSecondary.addHint' | translate }}"
+                           tooltipClass="primary-tooltip"></i></a>
+                    <ng-template ngbNavContent>
+                        <person-secondary-part [personLotState]="personLot.state"
+                                               (fromRsoEventEmitter)="setFromRso($event)"
+                                               [personLotId]="personLot.id"></person-secondary-part>
+                    </ng-template>
+                </ng-container>
+                <ng-container *ngIf="userDataService.isEmsUser() || 
+                            (userDataService.isRsdUser() && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster))"
+                              ngbNavItem="Student"
+                              [disabled]="currentPersonContextService.isInEdit">
+                    <a ngbNavLink>{{ 'rdpzsd.personLot.tabs.student' | translate }}</a>
+                    <ng-template ngbNavContent>
+                        <person-student-parts [personLotState]="personLot.state"
+                                              [personLotId]="personLot.id"></person-student-parts>
+                    </ng-template>
+                </ng-container>
+                <ng-container *ngIf="!currentPersonContextService.openedFromStickers 
+                                && (userDataService.isEmsUser() || (userDataService.isRsdUser() && userDataService.userData?.institution?.hasDoctoral))"
+                              ngbNavItem="Doctoral"
+                              [disabled]="currentPersonContextService.isInEdit">
+                    <a ngbNavLink>{{ 'rdpzsd.personLot.tabs.doctoral' | translate }}</a>
+                    <ng-template ngbNavContent>
+                        <person-doctoral-parts [personLotState]="personLot.state"
+                                               [personLotId]="personLot.id"></person-doctoral-parts>
+                    </ng-template>
+                </ng-container>
+                <ng-container *ngIf="userDataService.isEmsEditUser()"
+                              ngbNavItem="History"
+                              [disabled]="currentPersonContextService.isInEdit">
+                    <a ngbNavLink>{{ 'rdpzsd.personLot.tabs.history' | translate }}</a>
+                    <ng-template ngbNavContent>
+                        <person-lot-actions [personLotId]="personLot.id"></person-lot-actions>
+                    </ng-template>
+                </ng-container>
+            </nav>
+            <div [ngbNavOutlet]="nav"
+                 class="mt-2">
+            </div>
+        </div>
+
+        <ng-template #onlyPersonBasic>
+            <person-basic-part [personLotId]="personLot.id"
+                               [personLotState]="personLot.state"
+                               [personLotCreateUserId]="personLot.createUserId"></person-basic-part>
+        </ng-template>
+    </ng-container>
+</div>

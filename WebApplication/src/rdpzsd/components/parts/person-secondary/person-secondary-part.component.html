@@ -1,0 +1,74 @@
+<div *ngIf="!loadingData; else loadingSection"
+     class="card"
+     [ngClass]="{'mt-4': !fromModal}">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ 'rdpzsd.personSecondary.title' | translate }}</strong>
+                <i *ngIf="entity?.id && !entity.fromRso && !isEditMode"
+                   class="fas fa-exclamation-triangle ms-2 text-orange"
+                   ngbTooltip="{{ 'rdpzsd.personSecondary.addHint' | translate }}"
+                   tooltipClass="primary-tooltip"></i>
+            </div>
+
+            <div *ngIf="personLotId && !loadingData"
+                 class="d-flex align-items-center">
+
+                <sync-button *ngIf="configuration.enableFullFunctionality
+                            && configuration.enableRsoIntegration
+                            && ((!isEditMode && !entity?.id) || (entity?.id && isEditMode))
+                            && userDataService.isRsdUser()
+                            && !hideEditActions"
+                             btnClass="btn btn-primary btn-sm"
+                             text="root.buttons.getFromRso"
+                             [click]="getFromRso"
+                             [clickContext]="this"
+                             icon="fas fa-external-link-alt fa-sm"
+                             titleText="{{'root.buttons.getFromRsoLong' | translate}}">
+                </sync-button>
+
+                <sync-button *ngIf="configuration.enableFullFunctionality && !isEditMode && !entity?.id && userDataService.isRsdUser() && !hideEditActions"
+                             btnClass="btn btn-primary btn-sm ms-2"
+                             text="root.buttons.add"
+                             [click]="addPart"
+                             [clickParams]="[null]"
+                             [clickContext]="this"
+                             icon="fas fa-plus fa-sm">
+                </sync-button>
+
+                <part-actions *ngIf="entity"
+                              [model]="entity"
+                              (modelChange)="modelChange($event)"
+                              [(isEditMode)]="isEditMode"
+                              [invalidForm]="!isValidPersonSecondaryForm"
+                              [lotId]="personLotId"
+                              [fromModal]="fromModal"
+                              [hideEditActions]="!configuration.enableFullFunctionality || hideEditActions || !userDataService.isRsdUser()"
+                              (showHistoryEvent)="showHistory($event)"
+                              restUrl="PersonSecondary">
+                </part-actions>
+
+                <sync-button *ngIf="!isEditMode && fromModal"
+                             btnClass="btn btn-outline-primary btn-sm ms-2"
+                             text="root.buttons.close"
+                             [click]="closeModal"
+                             [clickContext]="this">
+                </sync-button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <person-secondary *ngIf="entity; else noSecondaryEducation"
+                          [isEditMode]="isEditMode"
+                          [personSecondary]="entity"
+                          [(isValidForm)]="isValidPersonSecondaryForm">
+        </person-secondary>
+        <ng-template #noSecondaryEducation>
+            <i class="text-red">{{ 'rdpzsd.personSecondary.noSecondaryEducation' | translate }}</i>
+        </ng-template>
+    </div>
+</div>
+
+<ng-template #loadingSection>
+    <loading-section></loading-section>
+</ng-template>

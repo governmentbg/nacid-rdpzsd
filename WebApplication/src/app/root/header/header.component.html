@@ -1,0 +1,6 @@
+<header class="shadow-sm">
+  <logout-header *ngIf="userDataService.currentAuthorizationState === userAuthorizationState.logout"
+                 class="logout-header-box"></logout-header>
+
+  <login-header *ngIf="userDataService.currentAuthorizationState === userAuthorizationState.login"></login-header>
+</header>

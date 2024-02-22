@@ -1,0 +1,62 @@
+import { EducationalQualification } from "src/nomenclatures/models/institution/educational-qualification.model";
+import { InstitutionSpeciality } from "src/nomenclatures/models/institution/institution-speciality.model";
+import { Institution } from "src/nomenclatures/models/institution/institution.model";
+import { AdmissionReason } from "src/nomenclatures/models/others/admission-reason.model";
+import { ResearchArea } from "src/nomenclatures/models/research-area.model";
+import { Country } from "src/nomenclatures/models/settlement/country.model";
+import { StudentEvent } from "src/nomenclatures/models/student-status/student-event.model";
+import { StudentStatus } from "src/nomenclatures/models/student-status/student-status.model";
+import { PreviousEducationType } from "src/rdpzsd/enums/parts/previous-education-type.enum";
+import { PreviousHighSchoolEducationType } from "src/rdpzsd/enums/parts/previous-high-school-education-type.enum";
+import { PersonStudent } from "../person-student/person-student.model";
+import { BasePersonSemester } from "./base-person-semester.model";
+import { PartInfo } from "./part-info.model";
+import { Part } from "./part.model";
+import { RdpzsdAttachedFile } from 'src/shared/models/rdpzsd-attached-file.model';
+
+export class BasePersonStudentDoctoral<TPartInfo extends PartInfo, TSemester extends BasePersonSemester> extends Part<TPartInfo> {
+    institutionId: number;
+    institution: Institution;
+    subordinateId: number;
+    subordinate: Institution;
+    institutionSpecialityId: number;
+    institutionSpeciality: InstitutionSpeciality;
+    studentStatusId: number;
+    studentStatus: StudentStatus;
+    studentEventId: number;
+    studentEvent: StudentEvent;
+    admissionReasonId: number;
+    admissionReason: AdmissionReason;
+
+    semesters: TSemester[] = [];
+
+    peType: PreviousEducationType;
+    peHighSchoolType: PreviousHighSchoolEducationType;
+    peDiplomaNumber: string;
+    peDiplomaDate: Date;
+    peResearchAreaId: number;
+    peResearchArea: ResearchArea;
+    peEducationalQualificationId: number;
+    peEducationalQualification: EducationalQualification;
+	peAcquiredForeignEducationalQualificationId: number;
+    peAcquiredForeignEducationalQualification: EducationalQualification;
+    pePartId: number;
+    pePart: PersonStudent;
+    peInstitutionId: number;
+    peInstitution: Institution;
+    peSubordinateId: number;
+    peSubordinate: Institution;
+    peInstitutionSpecialityId: number;
+    peInstitutionSpeciality: InstitutionSpeciality;
+    peSpecialityMissingInRegister: boolean;
+    peInstitutionName: string;
+    peSubordinateName: string;
+    peSpecialityName: string;
+    peCountryId: number;
+    peCountry: Country;
+    peRecognizedSpeciality: string;
+    peAcquiredSpeciality: string;
+	peRecognitionNumber: string;
+	peRecognitionDate: Date;
+	peRecognitionDocument: RdpzsdAttachedFile;
+}

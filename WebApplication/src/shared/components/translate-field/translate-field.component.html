@@ -1,0 +1,6 @@
+<span *ngIf="entity && translate.currentLang === 'bg'">
+  {{ entity[propertyName] }}
+</span>
+<span *ngIf="entity && translate.currentLang === 'en'">
+  {{ entity[propertyNameAlt] }}
+</span>

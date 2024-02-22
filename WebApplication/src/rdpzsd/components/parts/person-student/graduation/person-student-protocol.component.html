@@ -1,0 +1,134 @@
+<div class="d-flex justify-content-between">
+    <strong class="form-label fs-14 text-blue mt-2">{{ 'rdpzsd.personStudent.protocols' | translate }}</strong>
+    <sync-button *ngIf="!currentPersonContextService.isInEdit
+            && configuration.enableFullFunctionality
+            && protocols?.length < 3
+            && personLotState === lotState.actual
+            && partState === partStateType.actual
+            && studentStatusAlias === studentStatusProcessGraduation
+            && userDataService.isRsdUser() 
+            && institutionId === userDataService.userData.institution.id 
+            && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)
+            && (stickerState ===  studentStickerState.none || stickerState === studentStickerState.returnedForEdit)"
+                 btnClass="btn btn-primary btn-sm mb-2"
+                 text="root.buttons.addProtocol"
+                 [click]="addProtocol"
+                 [clickContext]="this">
+    </sync-button>
+</div>
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr>
+            <th class="col-4">{{ 'rdpzsd.personDiploma.protocolType' | translate }}</th>
+            <th class="col-3">{{ 'rdpzsd.personDiploma.protocolNumber' | translate }}</th>
+            <th class="col-3">{{ 'rdpzsd.personDiploma.protocolDate' | translate }}</th>
+            <th class="col-2">{{ 'root.results.actions' | translate }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-container *ngIf="protocols && protocols.length > 0; else noProtocols">
+            <ng-template ngFor
+                         let-protocol
+                         [ngForOf]="protocols"
+                         let-i="index">
+                <tr>
+                    <ng-container *ngIf="protocol.isEditMode">
+                        <td colspan="4">
+                            <form #form="ngForm"
+                                  autocomplete="off">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <enum-select [(ngModel)]="protocol.protocolType"
+                                                     name="protocolType{{i}}"
+                                                     enumName="studentProtocolType"
+                                                     [enumType]="studentProtocolType"
+                                                     [allowClear]="false"
+                                                     [required]="true"></enum-select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <input type="text"
+                                               class="form-control form-control-sm form-control-invalid"
+                                               [(ngModel)]="protocol.protocolNumber"
+                                               name="protocolNumber{{i}}"
+                                               maxlength="15"
+                                               noWhiteSpacesValidation />
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <date-time [(ngModel)]="protocol.protocolDate"
+                                                   name="protocolDate{{i}}"
+                                                   [required]="true"
+                                                   [useEndYear]="true"></date-time>
+                                    </div>
+
+                                    <div class="d-flex justify-content-center col-md-2">
+                                        <sync-button btnClass="btn btn-success btn-sm ms-2"
+                                                     icon="fas fa-save"
+                                                     titleText="{{ 'root.buttons.save' | translate }}"
+                                                     [disabled]="form.invalid"
+                                                     [click]="save"
+                                                     [clickContext]="this"
+                                                     [clickParams]="[i]">
+                                        </sync-button>
+
+                                        <sync-button *ngIf="protocol.id"
+                                                     titleText="Изтриване"
+                                                     btnClass="btn btn-danger btn-sm ms-2"
+                                                     icon="fas fa-trash"
+                                                     [click]="delete"
+                                                     [clickContext]="this"
+                                                     [clickParams]="[i]">
+                                        </sync-button>
+
+                                        <sync-button btnClass="btn btn-danger btn-sm ms-2"
+                                                     icon="fas fa-times"
+                                                     titleText="{{ 'root.buttons.cancel' | translate }}"
+                                                     [click]="cancel"
+                                                     [clickContext]="this"
+                                                     [clickParams]="[i]">
+                                        </sync-button>
+                                    </div>
+                                </div>
+                            </form>
+                        </td>
+                    </ng-container>
+
+                    <ng-container *ngIf="!protocol.isEditMode">
+                        <td>
+                            {{ 'enums.studentProtocolType.' + studentProtocolType[protocol.protocolType] | translate }}
+                        </td>
+                        <td>{{ protocol.protocolNumber }}</td>
+                        <td>{{ protocol.protocolDate | date: 'dd.MM.yyyy' }}</td>
+                        <td class="center-text-td">
+                            <sync-button *ngIf="!currentPersonContextService.isInEdit
+                                    && configuration.enableFullFunctionality
+                                    && personLotState === lotState.actual
+                                    && partState === partStateType.actual
+                                    && studentStatusAlias === studentStatusProcessGraduation
+                                    && userDataService.isRsdUser() 
+                                    && institutionId === userDataService.userData.institution.id 
+                                    && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)
+                                    && (stickerState ===  studentStickerState.none || stickerState === studentStickerState.returnedForEdit)"
+                                         btnClass="btn btn-primary btn-sm ms-2"
+                                         titleText="Редакция"
+                                         icon="fas fa-pen"
+                                         [click]="edit"
+                                         [clickContext]="this"
+                                         [clickParams]="[i]">
+                            </sync-button>
+                        </td>
+                    </ng-container>
+                </tr>
+            </ng-template>
+        </ng-container>
+        <ng-template #noProtocols>
+            <tr>
+                <td colspan="4"
+                    class="col-12">
+                    <i>{{ 'rdpzsd.personDiploma.noProtocols' | translate }}</i>
+                </td>
+            </tr>
+        </ng-template>
+    </tbody>
+</table>

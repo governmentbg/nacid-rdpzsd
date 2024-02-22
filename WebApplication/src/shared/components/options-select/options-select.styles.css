@@ -1,0 +1,22 @@
+:host {
+	display: block;
+	overflow-y: auto;
+	height: 100%;
+}
+
+.options-item {
+	padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 8px;
+}
+
+.options-item:hover {
+	cursor: pointer;
+	background-color: #0d6efd;
+	color: #fff;
+}
+
+.options-item-selected {
+	background-color: #0d6efd;
+	color: #fff;
+}

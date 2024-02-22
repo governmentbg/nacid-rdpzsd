@@ -1,0 +1,23 @@
+<section>
+    <div class="d-flex flex-row-reverse">
+        <button *ngIf="userDataService.isRsdUser()"
+                type="button"
+                class="btn btn-outline-primary shadow-none"
+                (click)="toggleUserSidebar()">
+            <i class="me-1 fas fa-user fw-700"></i>
+            <span class="fw-700">{{userDataService.userData.userFullname}}</span>
+        </button>
+
+        <dropdown-button *ngIf="userDataService.isEmsUser()"
+                         btnClass="btn btn-outline-primary btn-outline-primary-focus shadow-none"
+                         textClass="fw-700"
+                         icon="fas fa-user"
+                         dropdownRightClass="dropdown-right-top-0"
+                         [text]="userDataService.userData?.userFullname">
+            <div class="dropdown-item cursor-pointer"
+                 (click)="userDataService.logout()">
+                {{ 'user.exit' | translate }}
+            </div>
+        </dropdown-button>
+    </div>
+</section>

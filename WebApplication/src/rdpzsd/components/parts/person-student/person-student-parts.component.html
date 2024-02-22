@@ -1,0 +1,47 @@
+<div class="d-flex flex-row-reverse mt-4"
+     *ngIf="personLotId
+      && !currentPersonContext.openedFromStickers
+      && configuration.enableFullFunctionality 
+      && personLotState === lotState.actual
+      && userDataService.isRsdUser()
+      && !loadingData
+      && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)
+      && !currentPersonContext.isInEdit">
+    <sync-button btnClass="btn btn-primary btn-sm"
+                 text="root.buttons.add"
+                 [click]="addPart"
+                 [clickContext]="this"
+                 icon="fas fa-plus fa-sm">
+    </sync-button>
+</div>
+
+<ng-container *ngIf="!loadingData; else loadingSection">
+    <ng-template ngFor
+                 let-part
+                 [ngForOf]="parts"
+                 let-i="index">
+        <div *ngIf="!currentPersonContext.openedFromStickers || currentPersonContext.personStudentStickerDto?.partId === part?.id"
+             class="mt-4">
+
+            <div *ngIf="currentPersonContext.openedFromStickers && part?.studentEvent?.alias !== studentEventGraduatedWithDiploma"
+                 class="d-flex flex-row-reverse">
+                <div>
+                    <strong>{{ 'rdpzsd.searchMenu.sticker' | translate }}:</strong>
+                    <span [class.text-red]="part.stickerState === studentStickerState.returnedForEdit 
+                            || part.stickerState === studentStickerState.sendForStickerDiscrepancy">
+                        {{ 'enums.studentStickerState.' + studentStickerState[part.stickerState] | translate }}
+                    </span>
+                </div>
+            </div>
+
+            <person-student-part [part]="part"
+                                 [personLotId]="personLotId"
+                                 [personLotState]="personLotState"
+                                 (partRemovedEvent)="removePart(i)">
+            </person-student-part>
+        </div>
+    </ng-template>
+</ng-container>
+<ng-template #loadingSection>
+    <loading-section></loading-section>
+</ng-template>

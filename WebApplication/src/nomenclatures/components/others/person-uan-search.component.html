@@ -1,0 +1,22 @@
+<div class="container mt-4">
+    <nav ngbNav
+         #nav="ngbNav"
+         [(activeId)]="activeTab"
+         class="nav-tabs">
+        <ng-container ngbNavItem="Students">
+            <a ngbNavLink>{{ 'enums.personSearchFilterType.student' | translate }}</a>
+            <ng-template ngbNavContent>
+                <person-uan-export searchType="Students"></person-uan-export>
+            </ng-template>
+        </ng-container>
+        <ng-container ngbNavItem="Doctorals">
+            <a ngbNavLink>{{ 'enums.personSearchFilterType.doctoral' | translate }}</a>
+            <ng-template ngbNavContent>
+                <person-uan-export searchType="Doctorals"></person-uan-export>
+            </ng-template>
+        </ng-container>
+    </nav>
+  
+    <div [ngbNavOutlet]="nav"
+         class="mt-2"></div>
+  </div>

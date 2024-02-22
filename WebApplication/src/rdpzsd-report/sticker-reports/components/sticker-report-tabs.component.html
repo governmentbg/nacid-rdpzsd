@@ -1,0 +1,26 @@
+<div class="container">
+    <div class="d-flex align-items-center mb-4">
+        <span class="fas fa-info-circle text-blue fa-2x"></span>
+        <span class="ms-2 fs-18 fw-700 mt-1">{{ 'rdpzsdReport.stickerReportInfo' | translate }}</span>
+    </div>
+    <nav ngbNav
+         #nav="ngbNav"
+         [(activeId)]="activeTab"
+         class="nav-tabs">
+        <ng-container ngbNavItem="StudentSticker">
+            <a ngbNavLink>{{ 'rdpzsdReport.studentSticker.title' | translate }}</a>
+            <ng-template ngbNavContent>
+                <student-sticker-report></student-sticker-report>
+            </ng-template>
+        </ng-container>
+        <ng-container ngbNavItem="InstitutionSticker">
+            <a ngbNavLink>{{ 'rdpzsdReport.institutionSticker.title' | translate }}</a>
+            <ng-template ngbNavContent>
+                <institution-sticker-report></institution-sticker-report>
+            </ng-template>
+        </ng-container>
+    </nav>
+
+    <div [ngbNavOutlet]="nav"
+         class="mt-2"></div>
+</div>

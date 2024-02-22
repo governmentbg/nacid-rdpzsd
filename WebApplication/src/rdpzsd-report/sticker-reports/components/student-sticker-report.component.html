@@ -1,0 +1,71 @@
+<div class="card no-border shadow mt-4">
+    <form #form="ngForm"
+          autocomplete="off">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fs-14">{{ 'nomenclature.institution.name' | translate }}</label>
+                    <nomenclature-select restUrl="Nomenclature/Institution"
+                                         name="institution"
+                                         [(ngModel)]="filter.institution"
+                                         (keyPropertyChange)="filter.institutionId = $event"
+                                         [filter]="{level: level.first, getInstitutionsByPermissions: true}"
+                                         textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                         [disabled]="userDataService.isRsdUser()">
+                    </nomenclature-select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personStudent.stickers.year' | translate }}</label>
+                    <invalid-field [element]="stickerYear"
+                                   text="invalidFields.invalidStickerYear">
+                    </invalid-field>
+                    <div class="input-group input-group-sm">
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid"
+                               [(ngModel)]="filter.stickerYear"
+                               name="stickerYear"
+                               #stickerYear="ngModel"
+                               maxlength="4"
+                               minlength="4"
+                               numbersOnly
+                               [enableEmptyValidation]="true"
+                               [min]="2009"
+                               [max]="currentYear" />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fs-14">
+                        {{ 'rdpzsd.personStudent.stickers.state' | translate }}
+                    </label>
+                    <enum-select [(ngModel)]="filter.stickerState"
+                                 enumName="studentStickerState"
+                                 name="stickerState"
+                                 [enumType]="studentStickerStateReport"
+                                 [allowClear]="false"
+                                 [showSearchBox]="false"></enum-select>
+                </div>
+            </div>
+
+            <div class="d-flex flex-row-reverse mt-4">
+                <div class="btn-group">
+                    <sync-button btnClass="btn btn-success btn-sm ms-3"
+                                 text="root.buttons.excel"
+                                 [click]="exportReportExcel"
+                                 [clickContext]="this"
+                                 [disabled]="form.invalid"
+                                 icon="fas fa-download">
+                    </sync-button>
+
+                    <sync-button btnClass="btn btn-outline-primary btn-sm ms-3"
+                                 text="root.buttons.clear"
+                                 [click]="clear"
+                                 [clickContext]="this"
+                                 icon="fas fa-trash">
+                    </sync-button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

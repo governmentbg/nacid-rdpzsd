@@ -1,0 +1,6 @@
+<i *ngIf="stickerErrorDto.hasError"
+   class="fas fa-exclamation-triangle text-orange fs-16"
+   ngbTooltip="{{ 'rdpzsd.personStudent.stickers.hasSemesterError' | translate }}"
+   tooltipClass="primary-tooltip"
+   (click)="openStickerErrorModal($event)">
+</i>

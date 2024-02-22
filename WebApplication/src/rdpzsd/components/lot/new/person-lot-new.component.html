@@ -1,0 +1,660 @@
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <strong class="ft-upper">{{ 'rdpzsd.new.title' | translate }}</strong>
+        </div>
+        <div class="card-body">
+            <form #personCreateForm="ngForm"
+                  autocomplete="off">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <image-select #personImage="ngModel"
+                                      name="personImage"
+                                      [(ngModel)]="personBasic.personImage"
+                                      [imageKey]="personBasic.personImage?.key"
+                                      [disabled]="!configuration.enableFullFunctionality">
+                        </image-select>
+                    </div>
+
+                    <div class="col-md-9">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fs-14"
+                                       setColor
+                                       [element]="firstName">
+                                    {{ 'rdpzsd.personBasic.firstName' | translate }} {{'rdpzsd.personBasic.cyrillic' |
+                                    translate
+                                    }}</label>
+                                <invalid-field [element]="firstName"
+                                               text="invalidFields.cyrillicRequired"></invalid-field>
+                                <div class="input-group input-group-sm">
+                                    <input type="text"
+                                           class="form-control form-control-sm form-control-invalid-touched"
+                                           [(ngModel)]="personBasic.firstName"
+                                           name="firstName"
+                                           maxlength="50"
+                                           minlength="2"
+                                           #firstName="ngModel"
+                                           cyrillicValidation />
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label setColor
+                                [element]="middleName"
+                                class="form-label fs-14"
+                                      >{{ 'rdpzsd.personBasic.middleName' | translate }} {{
+                                    'rdpzsd.personBasic.cyrillic' | translate }}</label>
+                                <invalid-field [element]="middleName"
+                                               [requiredTouched]="false"
+                                               text="invalidFields.invalidMiddleName"></invalid-field>
+                                <div class="input-group input-group-sm">
+                                    <input type="text"
+                                           class="form-control form-control-sm form-control-invalid"
+                                           [(ngModel)]="personBasic.middleName"
+                                           name="middleName"
+                                           [required]="middleNameAlt.value?.length > 0 && middleNameAlt.valid"
+                                           #middleName="ngModel"
+                                           maxlength="50"
+                                           minlength="2"
+                                           cyrillicValidation
+                                           [enableEmptyValidation]="true"/>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fs-14"
+                                       setColor
+                                       [element]="lastName">
+                                    {{ 'rdpzsd.personBasic.lastName' | translate }} {{'rdpzsd.personBasic.cyrillic' |
+                                    translate }}</label>
+                                <invalid-field [element]="lastName"
+                                               text="invalidFields.cyrillicRequired"></invalid-field>
+                                <div class="input-group input-group-sm">
+                                    <input type="text"
+                                           class="form-control form-control-sm form-control-invalid-touched"
+                                           [(ngModel)]="personBasic.lastName"
+                                           name="lastName"
+                                           maxlength="50"
+                                           minlength="2"
+                                           #lastName="ngModel"
+                                           cyrillicValidation />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label setColor
+                                       [element]="otherNames" class="form-label fs-14"
+                                       >{{ 'rdpzsd.personBasic.otherNames' | translate }} {{
+                                    'rdpzsd.personBasic.cyrillic' | translate }}</label>
+                                <invalid-field [element]="otherNames"
+                                               [requiredTouched]="false"
+                                               text="invalidFields.invalidOtherNames"></invalid-field>
+                                <div class="input-group input-group-sm">
+                                    <input type="text"
+                                           class="form-control form-control-sm form-control-invalid"
+                                           [(ngModel)]="personBasic.otherNames"
+                                           [required]="otherNamesAlt.value?.length > 0 && otherNamesAlt.valid"
+                                           name="otherNames"
+                                           #otherNames="ngModel"
+                                           maxlength="50"
+                                           minlength="2"
+                                           cyrillicValidation
+                                           [enableEmptyValidation]="true"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fs-14"
+                                       setColor
+                                       [element]="firstNameAlt">
+                                    {{ 'rdpzsd.personBasic.firstName' | translate }} {{'rdpzsd.personBasic.latin' |
+                                    translate }}</label>
+                                <invalid-field [element]="firstNameAlt"
+                                               text="invalidFields.latinRequired"></invalid-field>
+                                <div class="input-group input-group-sm">
+                                    <input type="text"
+                                           class="form-control form-control-sm form-control-invalid-touched"
+                                           [(ngModel)]="personBasic.firstNameAlt"
+                                           name="firstNameAlt"
+                                           maxlength="50"
+                                           minlength="2"
+                                           #firstNameAlt="ngModel"
+                                           latinValidation />
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label 
+                                setColor
+                                       [element]="middleNameAlt"
+                                class="form-label fs-14"
+                                      >{{ 'rdpzsd.personBasic.middleName' | translate }} {{
+                                    'rdpzsd.personBasic.latin' | translate }}</label>
+                                <invalid-field [element]="middleNameAlt"
+                                               [requiredTouched]="false"
+                                               text="invalidFields.invalidMiddleNameAlt"></invalid-field>
+                                <div class="input-group input-group-sm">
+                                    <input type="text"
+                                           class="form-control form-control-sm form-control-invalid"
+                                           [(ngModel)]="personBasic.middleNameAlt"
+                                           [required]="middleName.value?.length > 0 && middleName.valid"
+                                           name="middleNameAlt"
+                                           #middleNameAlt="ngModel"
+                                           maxlength="50"
+                                           minlength="2"
+                                           latinValidation
+                                           [enableEmptyValidation]="true"/>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fs-14"
+                                       setColor
+                                       [element]="lastNameAlt">
+                                    {{ 'rdpzsd.personBasic.lastName' | translate }} {{'rdpzsd.personBasic.latin' |
+                                    translate }}</label>
+                                <invalid-field [element]="lastNameAlt"
+                                               text="invalidFields.latinRequired"></invalid-field>
+                                <div class="input-group input-group-sm">
+                                    <input type="text"
+                                           class="form-control form-control-sm form-control-invalid-touched"
+                                           [(ngModel)]="personBasic.lastNameAlt"
+                                           name="lastNameAlt"
+                                           maxlength="50"
+                                           minlength="2"
+                                           #lastNameAlt="ngModel"
+                                           latinValidation />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label setColor
+                                [element]="otherNamesAlt" 
+                                class="form-label fs-14"
+                                     >{{ 'rdpzsd.personBasic.otherNames' | translate }} {{
+                                    'rdpzsd.personBasic.latin' | translate }}</label>
+                                <invalid-field [element]="otherNamesAlt"
+                                               [requiredTouched]="false"
+                                               text="invalidFields.invalidOtherNamesAlt"></invalid-field>
+                                <div class="input-group input-group-sm">
+                                    <input type="text"
+                                           class="form-control form-control-sm form-control-invalid"
+                                           [(ngModel)]="personBasic.otherNamesAlt"
+                                           name="otherNamesAlt"
+                                           #otherNamesAlt="ngModel"
+                                           maxlength="50"
+                                           [required]="otherNames.value?.length > 0 && otherNames.valid"
+                                           minlength="2"
+                                           latinValidation
+                                           [enableEmptyValidation]="true"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fs-14">{{ 'rdpzsd.personBasic.uin' | translate }}</label>
+                        <invalid-field [element]="uin"
+                                       text="invalidFields.uin"></invalid-field>
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid-touched"
+                               [(ngModel)]="personBasic.uin"
+                               (ngModelChange)="changeUin($event, personBasic, uin)"
+                               name="uin"
+                               #uin="ngModel"
+                               maxlength="10"
+                               minlength="10"
+                               uinValidation
+                               [disabled]="personLotNewFilterDto.uin || personLotNewFilterDto.filterType === personLotNewFilterType.birthPlace"
+                               [enableEmptyValidation]="true" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fs-14">{{ 'rdpzsd.personBasic.foreignerNumber' | translate }}</label>
+                        <invalid-field [element]="foreignerNumber"
+                                       text="invalidFields.foreignerNumber"></invalid-field>
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid-touched"
+                               [(ngModel)]="personBasic.foreignerNumber"
+                               name="foreignerNumber"
+                               #foreignerNumber="ngModel"
+                               maxlength="10"
+                               minlength="10"
+                               foreignerNumberValidation
+                               [disabled]="personLotNewFilterDto.foreignerNumber || personLotNewFilterDto.filterType === personLotNewFilterType.birthPlace"
+                               [enableEmptyValidation]="true" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fs-14"
+                               setColor
+                               [element]="idnNumber">{{ 'rdpzsd.personBasic.idnNumber' | translate }}</label>
+                        <invalid-field *ngIf="personLotNewFilterDto.filterType === personLotNewFilterType.birthPlace && !personBasic.idnNumber"
+                                       [element]="idnNumber"
+                                       text="invalidFields.required"></invalid-field>
+
+                        <invalid-field *ngIf="personBasic.idnNumber"
+                                       [element]="idnNumber"
+                                       text="invalidFields.idnNumber"></invalid-field>
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid-touched"
+                               [(ngModel)]="personBasic.idnNumber"
+                               name="idnNumber"
+                               #idnNumber="ngModel"
+                               maxlength="25"
+                               minlength="6"
+                               (ngModelChange)="personBasic.idnNumber = $event.toUpperCase()"
+                               customRegexValidation
+                               [enableEmptyValidation]="true"
+                               patternName="idnNumberRegex"
+                               [required]="personLotNewFilterDto.filterType === personLotNewFilterType.birthPlace" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fs-14"
+                               setColor
+                               [element]="passportCopy">{{ 'rdpzsd.personBasic.passportCopy' | translate }}</label>
+                        <invalid-field *ngIf="personLotNewFilterDto.filterType === personLotNewFilterType.birthPlace"
+                                       [element]="passportCopy"
+                                       text="invalidFields.required"></invalid-field>
+                        <file-upload #passportCopy="ngModel"
+                                     name="passportCopy"
+                                     [required]="personLotNewFilterDto.filterType === personLotNewFilterType.birthPlace"
+                                     [hideNoFileUpload]="true"
+                                     [(ngModel)]="personBasic.passportCopy"
+                                     [disabled]="!configuration.enableFullFunctionality"></file-upload>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fs-14"
+                               setColor
+                               [element]="birthDate">{{ 'rdpzsd.personBasic.birthDate' | translate }}</label>
+                        <invalid-field [element]="birthDate"
+                                       text="invalidFields.required"></invalid-field>
+                        <date-time [(ngModel)]="personBasic.birthDate"
+                                   name="birthDate"
+                                   [isBirthDate]="true"
+                                   #birthDate="ngModel"
+                                   [disabled]="!!personBasic.uin?.length || personLotNewFilterDto.filterType === personLotNewFilterType.birthPlace"
+                                   [required]="true"></date-time>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fs-14"
+                               setColor
+                               [element]="gender">{{ 'rdpzsd.personBasic.gender' | translate }}</label>
+                        <enum-select [(ngModel)]="personBasic.gender"
+                                     name="gender"
+                                     enumName="genderType"
+                                     #gender="ngModel"
+                                     [disabled]="!!personBasic.uin?.length"
+                                     [enumType]="genderType"
+                                     [required]="true"
+                                     [touched]="false"></enum-select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fs-14 fw-bold"
+                               setColor
+                               [element]="email">{{ 'rdpzsd.personBasic.email' | translate}}</label>
+                        <invalid-field [element]="email"
+                                       text="invalidFields.email"></invalid-field>
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid-touched"
+                               [(ngModel)]="personBasic.email"
+                               #email="ngModel"
+                               maxlength="50"
+                               minlength="8"
+                               name="email"
+                               emailValidation />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fs-14"
+                               setColor
+                               [element]="phoneNumber">
+                            {{ 'rdpzsd.personBasic.phone' | translate}}</label>
+                        <invalid-field [element]="phoneNumber"
+                                       text="invalidFields.phone"></invalid-field>
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid-touched"
+                               [(ngModel)]="personBasic.phoneNumber"
+                               #phoneNumber="ngModel"
+                               maxlength="18"
+                               minlength="9"
+                               name="phoneNumber"
+                               phoneValidation />
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fs-14"
+                               setColor
+                               [element]="birthCountry">{{ 'rdpzsd.personBasic.birthPlace' | translate }}</label>
+                        <invalid-field [element]="birthCountry"
+                                       text="invalidFields.required"></invalid-field>
+                        <nomenclature-select restUrl="Nomenclature/Country"
+                                             name="birthCountry"
+                                             #birthCountry="ngModel"
+                                             [(ngModel)]="personBasic.birthCountry"
+                                             [filter]="personLotNewFilterDto.filterType === personLotNewFilterType.birthPlace ? {excludeCode: 'BG'} : {excludeCode: null}"
+                                             (ngModelChange)="settlementChangeService.countryChange(personBasic, $event, 'birthCountry', 'birthDistrict', 'birthMunicipality', 'birthSettlement')"
+                                             textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                             [required]="true"
+                                             [disabled]="personLotNewFilterDto.filterType === personLotNewFilterType.birthPlace"
+                                             [touched]="false">
+                        </nomenclature-select>
+                    </div>
+
+                    <div class="col-md-3"
+                         *ngIf="personBasic.birthCountry && personBasic.birthCountry.code != 'BG'">
+                        <label class="form-label fs-14"
+                               setColor
+                               [element]="foreignerBirthSettlement">{{ 'rdpzsd.personBasic.foreignerBirthSettlement' |
+                            translate }}
+                        </label>
+                        <invalid-field [element]="foreignerBirthSettlement"
+                                       text="invalidFields.cyrillicRequired"></invalid-field>
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid-touched"
+                               [(ngModel)]="personBasic.foreignerBirthSettlement"
+                               name="foreignerBirthSettlement"
+                               #foreignerBirthSettlement="ngModel"
+                               customRegexValidation
+                               maxlength="50"
+                               minlength="3"
+                               patternName="foreignerBirthSettlement"
+                               noWhiteSpacesValidation />
+                    </div>
+
+                    <div class="col-md-3"
+                         *ngIf="personBasic.birthCountry && personBasic.birthCountry.code !== 'BG'">
+                        <label class="form-label fs-14"
+                               setColor
+                               [element]="citizenship">{{ 'rdpzsd.personBasic.citizenship' | translate }}</label>
+                        <invalid-field [element]="citizenship"
+                                       text="invalidFields.required"></invalid-field>
+                        <nomenclature-select restUrl="Nomenclature/Country"
+                                             name="citizenship"
+                                             #citizenship="ngModel"
+                                             [(ngModel)]="personBasic.citizenship"
+                                             [includeInactive]="true"
+                                             [filter]="{ excludeCode: 'MISSING' }"
+                                             (ngModelChange)="citizenshipChange($event)"
+                                             textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                             [required]="true"
+                                             [touched]="false">
+                        </nomenclature-select>
+                    </div>
+
+                    <div class="col-md-3"
+                         *ngIf="personBasic.birthCountry && personBasic.birthCountry.code !== 'BG' && personBasic.citizenship">
+                        <label class="form-label fs-14"
+                                setColor
+                                [element]="secondCitizenship">{{ 'rdpzsd.personBasic.secondCitizenship' | translate }}</label>
+                        <invalid-field [element]="secondCitizenship"
+                                       text="invalidFields.invalidCitizenship"></invalid-field>
+                        <nomenclature-select restUrl="Nomenclature/Country"
+                                             name="secondCitizenship"
+                                             #secondCitizenship="ngModel"
+                                             citizenshipValidation
+                                             [formControlClass]="secondCitizenship.value !== null && secondCitizenship.invalid ? 'form-control form-control-sm form-control-invalid-nomenclature' : 'form-control form-control-sm'"
+                                             [otherCitizenshipId]="personBasic.citizenshipId"
+                                             [touched]="true"
+                                             [(ngModel)]="personBasic.secondCitizenship"
+                                             (keyPropertyChange)="personBasic.secondCitizenshipId = $event"
+                                             textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                        </nomenclature-select>
+                    </div>
+
+
+                    <ng-container *ngIf="personBasic.birthCountry && personBasic.birthCountry.code === 'BG'">
+                        <div class="col-md-3">
+                            <label class="form-label fs-14"
+                                   setColor
+                                   [element]="birthSettlement">{{ 'nomenclature.settlement.name' | translate }}</label>
+                            <invalid-field [element]="birthSettlement"
+                                           text="invalidFields.required"></invalid-field>
+                            <nomenclature-select restUrl="Nomenclature/Settlement"
+                                                 name="birthSettlement"
+                                                 #birthSettlement="ngModel"
+                                                 [(ngModel)]="personBasic.birthSettlement"
+                                                 (ngModelChange)="settlementChangeService.settlementChange(personBasic, $event, 'birthSettlement', 'birthDistrict', 'birthMunicipality')"
+                                                 [filter]="{districtId: personBasic.birthDistrictId, municipalityId: personBasic.birthMunicipalityId}"
+                                                 textTemplate="{{translateService.currentLang === 'bg' ? '{name}, обл. {district.name}, общ. {municipality.name}' : '{nameAlt}, {district.nameAlt}, {municipality.nameAlt}'}}"
+                                                 [required]="true"
+                                                 [touched]="false">
+                            </nomenclature-select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fs-14"
+                                   setColor
+                                   [element]="birthDistrict">{{ 'nomenclature.district.name' | translate }} </label>
+                            <invalid-field [element]="birthDistrict"
+                                           text="invalidFields.required"></invalid-field>
+                            <nomenclature-select restUrl="Nomenclature/District"
+                                                 name="birthDistrict"
+                                                 #birthDistrict="ngModel"
+                                                 [touched]="false"
+                                                 [required]="true"
+                                                 [(ngModel)]="personBasic.birthDistrict"
+                                                 (ngModelChange)="settlementChangeService.districtChange(personBasic, $event, 'birthDistrict')"
+                                                 textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                            </nomenclature-select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fs-14"
+                                   setColor
+                                   [element]="birthMunicipality">{{ 'nomenclature.municipality.name' | translate }}
+                            </label>
+                            <invalid-field [element]="birthMunicipality"
+                                           text="invalidFields.required"></invalid-field>
+                            <nomenclature-select restUrl="Nomenclature/Municipality"
+                                                 name="birthMunicipality"
+                                                 #birthMunicipality="ngModel"
+                                                 [touched]="false"
+                                                 [required]="true"
+                                                 [(ngModel)]="personBasic.birthMunicipality"
+                                                 (ngModelChange)="settlementChangeService.municipalityChange(personBasic, $event, 'birthMunicipality')"
+                                                 [filter]="{districtId: personBasic.birthDistrictId}"
+                                                 textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                            </nomenclature-select>
+                        </div>
+                    </ng-container>
+                </div>
+
+                <div class="row g-3"
+                     *ngIf="!personBasic.birthCountry || personBasic.birthCountry.code === 'BG'">
+                    <div class="col-md-3">
+                        <label class="form-label fs-14"
+                               setColor
+                               [element]="citizenship">{{ 'rdpzsd.personBasic.citizenship' | translate }}</label>
+                        <invalid-field [element]="citizenship"
+                                       text="invalidFields.required"></invalid-field>
+                        <nomenclature-select restUrl="Nomenclature/Country"
+                                             name="citizenship"
+                                             #citizenship="ngModel"
+                                             [(ngModel)]="personBasic.citizenship"
+                                             (ngModelChange)="citizenshipChange($event)"
+                                             textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                             [required]="true"
+                                             [touched]="false">
+                        </nomenclature-select>
+                    </div>
+
+                    <div class="col-md-3"
+                         *ngIf="personBasic.citizenship">
+                        <label class="form-label fs-14"
+                                setColor
+                                [element]="secondCitizenship">{{ 'rdpzsd.personBasic.secondCitizenship' | translate }}</label>
+                        <invalid-field [element]="secondCitizenship"
+                                       text="invalidFields.invalidCitizenship"></invalid-field>
+                        <nomenclature-select restUrl="Nomenclature/Country"
+                                             name="secondCitizenship"
+                                             #secondCitizenship="ngModel"
+                                             [formControlClass]="secondCitizenship.value !== null && secondCitizenship.invalid ? 'form-control form-control-sm form-control-invalid-nomenclature' : 'form-control form-control-sm'"
+                                             citizenshipValidation
+                                             [otherCitizenshipId]="personBasic.citizenshipId"
+                                             [(ngModel)]="personBasic.secondCitizenship"
+                                             (keyPropertyChange)="personBasic.secondCitizenshipId = $event"
+                                             textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                        </nomenclature-select>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fs-14"
+                               setColor
+                               [element]="residenceCountry">{{ 'rdpzsd.personBasic.residence' | translate }}</label>
+                        <invalid-field [element]="residenceCountry"
+                                       text="invalidFields.required"></invalid-field>
+                        <nomenclature-select restUrl="Nomenclature/Country"
+                                             name="residenceCountry"
+                                             #residenceCountry="ngModel"
+                                             [(ngModel)]="personBasic.residenceCountry"
+                                             (ngModelChange)="settlementChangeService.countryChange(personBasic, $event, 'residenceCountry', 'residenceDistrict', 'residenceMunicipality', 'residenceSettlement')"
+                                             textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                             [required]="true"
+                                             [touched]="false">
+                        </nomenclature-select>
+                    </div>
+
+                    <div class="col-md-9"
+                         *ngIf="personBasic.residenceCountry && personBasic.residenceCountry.code !== 'BG'">
+                        <label class="form-label fs-14">{{ 'rdpzsd.personBasic.residenceAddressForeigner' | translate}}
+                            {{ 'rdpzsd.personBasic.latin' | translate }}</label>
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid-touched"
+                               [(ngModel)]="personBasic.residenceAddress"
+                               name="residenceAddressForeigner"
+                               #residenceAddressForeigner="ngModel"
+                               customRegexValidation
+                               maxlength="255"
+                               minlength="8"
+                               patternName="residenceAddressLatin"
+                               [enableEmptyValidation]="true" />
+                    </div>
+
+                    <div *ngIf="personBasic.residenceCountry && personBasic.residenceCountry.code === 'BG'"
+                         class="col-md-3">
+                        <label class="form-label fs-14"
+                               setColor
+                               [element]="residenceSettlement">{{ 'nomenclature.settlement.name' | translate }}</label>
+                        <invalid-field [element]="residenceSettlement"
+                                       text="invalidFields.required"></invalid-field>
+                        <nomenclature-select restUrl="Nomenclature/Settlement"
+                                             name="residenceSettlement"
+                                             #residenceSettlement="ngModel"
+                                             [(ngModel)]="personBasic.residenceSettlement"
+                                             (ngModelChange)="settlementChangeService.settlementChange(personBasic, $event, 'residenceSettlement', 'residenceDistrict', 'residenceMunicipality')"
+                                             [filter]="{districtId: personBasic.residenceDistrictId, municipalityId: personBasic.residenceMunicipalityId}"
+                                             textTemplate="{{translateService.currentLang === 'bg' ? '{name}, обл. {district.name}, общ. {municipality.name}' : '{nameAlt}, {district.nameAlt}, {municipality.nameAlt}'}}"
+                                             [required]="true"
+                                             [touched]="false">
+                        </nomenclature-select>
+                    </div>
+
+                    <div *ngIf="personBasic.residenceCountry && personBasic.residenceCountry.code === 'BG'"
+                         class="col-md-3">
+                        <label class="form-label fs-14"
+                               setColor
+                               [element]="residenceDistrict">{{ 'nomenclature.district.name' | translate }}</label>
+                        <invalid-field [element]="residenceDistrict"
+                                       text="invalidFields.required"></invalid-field>
+                        <nomenclature-select restUrl="Nomenclature/District"
+                                             name="residenceDistrict"
+                                             #residenceDistrict="ngModel"
+                                             [touched]="false"
+                                             [required]="true"
+                                             [(ngModel)]="personBasic.residenceDistrict"
+                                             (ngModelChange)="settlementChangeService.districtChange(personBasic, $event, 'residenceDistrict')"
+                                             textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                        </nomenclature-select>
+                    </div>
+
+                    <div *ngIf="personBasic.residenceCountry && personBasic.residenceCountry.code === 'BG'"
+                         class="col-md-3">
+                        <label class="form-label fs-14"
+                               setColor
+                               [element]="residenceMunicipality">{{ 'nomenclature.municipality.name' | translate
+                            }}</label>
+                        <invalid-field [element]="residenceMunicipality"
+                                       text="invalidFields.required"></invalid-field>
+                        <nomenclature-select restUrl="Nomenclature/Municipality"
+                                             name="residenceMunicipality"
+                                             #residenceMunicipality="ngModel"
+                                             [touched]="false"
+                                             [required]="true"
+                                             [(ngModel)]="personBasic.residenceMunicipality"
+                                             (ngModelChange)="settlementChangeService.municipalityChange(personBasic, $event, 'residenceMunicipality')"
+                                             [filter]="{districtId: personBasic.residenceDistrictId}"
+                                             textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                        </nomenclature-select>
+                    </div>
+                </div>
+
+                <div class="row g-3"
+                     *ngIf="personBasic.residenceCountry && personBasic.residenceCountry.code === 'BG'">
+                    <div class="col-md-1">
+                        <label class="form-label fs-14">{{ 'rdpzsd.personBasic.postCode' | translate }}</label>
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid-touched"
+                               [(ngModel)]="personBasic.postCode"
+                               name="postCode"
+                               #postCode="ngModel"
+                               maxlength="4"
+                               minlength="4"
+                               [enableEmptyValidation]="true"
+                               numbersOnly />
+                    </div>
+                    <div class="col-md-11">
+                        <label class="form-label fs-14">{{ 'rdpzsd.personBasic.residenceAddress' | translate }}</label>
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid-touched"
+                               [(ngModel)]="personBasic.residenceAddress"
+                               name="residenceAddress"
+                               #residenceAdress="ngModel"
+                               customRegexValidation
+                               maxlength="255"
+                               minlength="8"
+                               [enableEmptyValidation]="true"
+                               patternName="residenceAddressCyrillic" />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="d-flex flex-row-reverse mt-4">
+        <div class="btn-group">
+            <sync-button *ngIf="configuration.enableFullFunctionality && (userDataService.isRsdUser() || userDataService.isEmsEditUser())"
+                         btnClass="btn btn-primary"
+                         text="{{ personLotNewFilterDto.filterType === personLotNewFilterType.birthPlace && userDataService.isRsdUser() ? 'rdpzsd.personLot.lotActions.sendForApproval' : 'root.buttons.create' }}"
+                         [click]="createLot"
+                         [clickContext]="this"
+                         [disabled]="personCreateForm.invalid">
+            </sync-button>
+
+            <sync-button btnClass="btn btn-outline-primary ms-2"
+                         text="root.buttons.cancel"
+                         [click]="cancel"
+                         [clickContext]="this">
+            </sync-button>
+        </div>
+    </div>
+</div>

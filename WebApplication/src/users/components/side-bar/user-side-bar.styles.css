@@ -1,0 +1,103 @@
+.user-side-bar {
+  position: fixed;
+  top: auto;
+  right: 0;
+  z-index: 9999;
+  height: 100%;
+}
+
+.user-side-bar-body {
+  height: 100%;
+}
+
+.user-institution-logo {
+  max-height: 150px;
+  max-height: 170px;
+}
+
+.institution-name {
+  font-weight: 700;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.display-none {
+  display: none;
+}
+
+.bachelor-checkbox {
+  margin-left: 31px;
+}
+
+.doctoral-checkbox {
+  margin-right: 31px;
+}
+
+@media screen and (max-width: 576px) {
+  .user-side-bar-body {
+    width: 100%;
+  }
+}
+
+@media screen and (min-width: 576px) {
+  .user-side-bar-body {
+    width: 350px;
+  }
+}
+
+@media screen and (min-height: 900px) {
+  .institution-section {
+    height: 33%;
+  }
+  
+  .child-institution-section {
+    height: 47%;
+    overflow-y: auto;
+  }
+  
+  .bottom-section {
+    height: 10%;
+  }
+  
+  .no-institution-section {
+    height: 80%;
+  }
+}
+
+@media screen and (min-height: 700px) and (max-height: 900px){
+  .institution-section {
+    height: 45%;
+  }
+  
+  .child-institution-section {
+    height: 30%;
+    overflow-y: auto;
+  }
+  
+  .bottom-section {
+    height: 25%;
+  }
+  
+  .no-institution-section {
+    height: 60%;
+  }
+}
+
+@media screen and (max-height: 700px) {
+  .institution-section {
+    height: 55%;
+  }
+  
+  .child-institution-section {
+    height: 20%;
+    overflow-y: auto;
+  }
+  
+  .bottom-section {
+    height: 25%;
+  }
+  
+  .no-institution-section {
+    height: 60%;
+  }
+}

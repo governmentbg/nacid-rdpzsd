@@ -1,0 +1,26 @@
+<div class="img-changer mt-3">
+	<ng-container *ngIf="!fileUploadProgress; else loadingSection">
+		<img [src]="imgSrc"
+			 [ngClass]="{'cursor-pointer': imageKey && carouselEnabled}"
+			 (click)="openCarousel()"
+			 class="img-file"
+			 alt="Person Image">
+		<div class="upload-image"
+			 *ngIf="!disabled">
+			<button class="choose-image btn btn-sm btn-outline-primary"
+					style="border-radius: 3px;"
+					(click)="fileSelect.click()">
+				{{ 'rdpzsd.personBasic.imgUpload' | translate }}
+
+				<input #fileSelect
+					   type="file"
+					   accept=".png, .jpg, .jpeg, .gif, .tiff, .tif, .bpg"
+					   style="display: none;"
+					   (change)="changeImage($event)">
+			</button>
+		</div>
+	</ng-container>
+	<ng-template #loadingSection>
+		<loading-section></loading-section>
+	</ng-template>
+</div>

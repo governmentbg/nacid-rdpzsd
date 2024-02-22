@@ -1,0 +1,22 @@
+<div class="card mb-4">
+    <div class="card-body"
+         [class.bc-lightcoral]="currentPersonContextService?.personLotState === lotState.erased">
+        <div class="d-flex justify-content-between">
+            <div class="d-flex">
+                <strong *ngIf="currentPersonContextService?.personLotState !== lotState.pendingApproval 
+                    && currentPersonContextService?.personLotState !== lotState.cancelApproval
+                    && currentPersonContextService?.personLotState !== lotState.missingPassportCopy">
+                    {{ currentPersonContextService?.uan }}
+                </strong>
+                <strong class="ms-2">
+                    {{ currentPersonContextService?.personBasicNames }}
+                </strong>
+            </div>
+            <span *ngIf="currentPersonContextService?.personLotState !== lotState.actual">
+                <b>
+                    {{ 'rdpzsd.personLot.state' | translate }}:
+                </b> <span [ngClass]="{ 'text-red': currentPersonContextService?.personLotState === lotState.missingPassportCopy }">{{ 'enums.lotState.' + lotState[currentPersonContextService?.personLotState] | translate }}</span>
+            </span>
+        </div>
+    </div>
+</div>

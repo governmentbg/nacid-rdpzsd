@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FileStorageNetCore" Version="5.0.2" />
+    <PackageReference Include="iTextSharp.NetCore" Version="5.5.13.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Rdpzsd.Models\Rdpzsd.Models.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,157 @@
+<div class="container">
+    <div class="card no-border shadow mt-4">
+        <div class="card-body">
+            <div *ngIf="userDataService.isEmsEditUser()"
+                 class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label fs-14">{{ 'nomenclature.institution.title' | translate }}</label>
+                    <nomenclature-select restUrl="Nomenclature/Institution"
+                                         [(ngModel)]="filter.createInstitution"
+                                         [disabled]="!searchResult.result.length"
+                                         (ngModelChange)="institutionChangeService.institutionChange(filter, $event, 'createInstitution', 'createSubordinate')"
+                                         [filter]="{level: level.first}"
+                                         textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                    </nomenclature-select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fs-14">{{ 'nomenclature.subordinate.name' | translate }}</label>
+                    <nomenclature-select restUrl="Nomenclature/Institution"
+                                         [(ngModel)]="filter.createSubordinate"
+                                         [disabled]="!searchResult.result.length"
+                                         (ngModelChange)="institutionChangeService.subordinateChange(filter, $event, 'createSubordinate', 'createInstitution')"
+                                         [filter]="{level: level.second, parentId: filter.createInstitutionId }"
+                                         textTemplate="{{translateService.currentLang === 'bg' ? '{name} ({parent.shortName})' : '{nameAlt} ({parent.shortNameAlt})'}}">
+                    </nomenclature-select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personLot.state' | translate }}</label>
+                    <enum-select [(ngModel)]="filter.state"
+                                 enumName="approvalState"
+                                 [enumType]="approvalState"></enum-select>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+                <div class="d-flex">
+                    <button *ngIf="searchResult.result.length > 0"
+                        class="btn btn-primary btn-sm"
+                        (click)="getDataCount()">
+                        <i style="min-width: 15px" [ngClass]="[loadingDataCount ? 'fas fa-sync fa-spin' : 'fas fa-info']"></i>
+                    </button>
+
+                    <a *ngIf="!dataCount && searchResult.result?.length > 0" 
+                            [routerLink]="" 
+                            class="no-text-decoration cursor-pointer fs-18 ms-2 mt-p2"
+                            (click)="getDataCount()">
+                        {{ 'root.results.number' | translate }} {{ 'root.results.records' | translate }}
+                    </a>
+    
+                    <div *ngIf="dataCount != null"
+                         class="d-flex align-items-center ms-2">
+                        <label class="fs-18">
+                          <span *ngIf="!loadingData">
+                            {{ 'root.results.total' | translate }} {{dataCount | formatNumber}}
+                            {{ 'root.results.records' | translate }}
+                          </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <sync-button btnClass="btn btn-primary btn-sm ms-3"
+                                 text="root.buttons.search"
+                                 [click]="getData"
+                                 [clickParams]="[false, false]"
+                                 [clickContext]="this"
+                                 icon="fas fa-search">
+                    </sync-button>
+
+                    <sync-button btnClass="btn btn-outline-primary btn-sm ms-3"
+                                 text="root.buttons.clear"
+                                 [click]="clear"
+                                 [clickContext]="this"
+                                 icon="fas fa-trash">
+                    </sync-button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="table-scrollable">
+        <table class="table table-bordered mt-4">
+            <thead class="table-light">
+                <tr>
+                    <th class="col-3">{{ 'rdpzsd.personBasic.fullName' | translate }}</th>
+                    <th class="col-3">{{ 'rdpzsd.personBasic.birthPlace' | translate }}</th>
+                    <th class="col-3">{{ 'rdpzsd.personLot.createUser' | translate }}</th>
+                    <th class="col-2">{{ 'rdpzsd.personLot.state' | translate }}</th>
+                    <th class="col-1 center-text-th">
+                        {{ 'root.results.actions' | translate }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngIf="!loadingData; else loadingSection">
+                    <ng-container *ngIf="searchResult.result && searchResult.result.length > 0; else noResults">
+                        <tr *ngFor="let personForApproval of searchResult.result"
+                            [class.bc-yellow]="personForApproval.state === lotState.pendingApproval">
+                            <td>
+                                <div>{{ personForApproval.fullName }}</div>
+                                <div>{{ personForApproval.fullNameAlt }}</div>
+                            </td>
+                            <td>
+                                {{personForApproval.birthDate | date: 'dd.MM.yyyy'}}, {{
+                                personForApproval.foreignerBirthSettlement}}, {{translateService.currentLang === 'bg' ?
+                                personForApproval.birthCountry?.name : personForApproval.birthCountry?.nameAlt}}
+                            </td>
+                            <td>
+                                <div>
+                                    {{ personForApproval.createDate | date: 'dd.MM.yyyy'}},
+                                    <span *ngIf="personForApproval?.createSubordinate; else createInstitution">
+                                        {{personForApproval.createInstitution?.shortName}},
+                                        {{personForApproval.createSubordinate?.shortName}}
+                                    </span> -
+                                    <ng-template #createInstitution>
+                                        {{personForApproval.createInstitution?.shortName}}
+                                    </ng-template>{{ personForApproval.createUser?.fullname }}
+                                    <div *ngIf="personForApproval.createUser?.email">
+                                        <a
+                                           href="mailto:{{personForApproval.createUser?.email}}">{{personForApproval.createUser?.email}}</a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {{ 'enums.lotState.' + lotState[personForApproval?.state] | translate }}
+                            </td>
+                            <td class="center-text-td">
+                                <sync-button btnClass="btn btn-transperant btn-sm"
+                                             icon="fas fa-search"
+                                             [click]="getStudentForApproval"
+                                             [clickContext]="this"
+                                             [clickParams]="[personForApproval.uan]">
+                                </sync-button>
+                            </td>
+                        </tr>
+                    </ng-container>
+                    <ng-template #noResults>
+                        <tr>
+                            <td colspan="5"
+                                class="col-12">
+                                <i>{{ 'root.results.noResults' | translate }}</i>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </ng-container>
+                <ng-template #loadingSection>
+                    <tr>
+                        <td colspan="5"
+                            class="col-12">
+                            <loading-section></loading-section>
+                        </td>
+                    </tr>
+                </ng-template>
+            </tbody>
+        </table>
+    </div>
+</div>

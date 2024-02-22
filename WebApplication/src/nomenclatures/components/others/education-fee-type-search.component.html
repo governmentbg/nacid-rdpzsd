@@ -1,0 +1,112 @@
+<div class="card no-border shadow mt-4">
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label for="name"
+               class="form-label fs-14">{{ 'nomenclature.educationFeeType.name' | translate }}</label>
+        <input type="text"
+               class="form-control form-control-sm"
+               [(ngModel)]="filter.name"
+               id="name"
+               name="name">
+      </div>
+      <div class="col-md-4">
+        <label for="nameAlt"
+               class="form-label fs-14">{{ 'nomenclature.educationFeeType.nameAlt' | translate }}</label>
+        <input type="text"
+               class="form-control form-control-sm"
+               [(ngModel)]="filter.nameAlt"
+               id="nameAlt"
+               name="nameAlt">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label fs-14">{{ 'nomenclature.isActive' | translate }}</label>
+        <bool-select [(ngModel)]="filter.isActive">
+        </bool-select>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+      <div class="btn-group">
+        <sync-button btnClass="btn btn-outline-success btn-sm"
+                     text="root.buttons.excel"
+                     [click]="exportExcel"
+                     [clickContext]="this"
+                     icon="fas fa-download">
+        </sync-button>
+      </div>
+      <div class="btn-group">
+        <sync-button btnClass="btn btn-primary btn-sm"
+                     text="root.buttons.search"
+                     [click]="getData"
+                     [clickParams]="[false]"
+                     [clickContext]="this"
+                     icon="fas fa-search">
+        </sync-button>
+
+        <sync-button btnClass="btn btn-outline-primary btn-sm ms-3"
+                     text="root.buttons.clear"
+                     [click]="clear"
+                     [clickContext]="this"
+                     icon="fas fa-trash">
+        </sync-button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="table-scrollable">
+  <table class="table table-bordered mt-4">
+    <thead class="table-light">
+      <tr>
+        <th class="col-1">{{ 'nomenclature.educationFeeType.number' | translate }}</th>
+        <th class="col-3">{{ 'nomenclature.educationFeeType.name' | translate }}</th>
+        <th class="col-3">{{ 'nomenclature.educationFeeType.nameAlt' | translate }}</th>
+        <th class="col-1 center-text-th">{{ 'nomenclature.isActive' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngIf="!loadingData; else loadingSection">
+        <ng-container *ngIf="searchResult.result && searchResult.result.length > 0; else noResults">
+          <tr *ngFor="let educationFeeType of searchResult.result">
+            <td>{{ educationFeeType.id }}</td>
+            <td>{{ educationFeeType.name }}</td>
+            <td>{{ educationFeeType.nameAlt }}</td>
+            <td class="center-text-td">
+              <span *ngIf="educationFeeType.isActive"
+                    class="fas fa-check"></span>
+              <span *ngIf="!educationFeeType.isActive"
+                    class="fas fa-times"></span>
+            </td>
+          </tr>
+        </ng-container>
+        <ng-template #noResults>
+          <tr>
+            <td colspan="6"
+                class="col-12">
+              <i>{{ 'root.results.noResults' | translate }}</i>
+            </td>
+          </tr>
+        </ng-template>
+      </ng-container>
+      <ng-template #loadingSection>
+        <tr>
+          <td colspan="6"
+              class="col-12">
+            <loading-section></loading-section>
+          </td>
+        </tr>
+      </ng-template>
+    </tbody>
+  </table>
+</div>
+
+<ngb-pagination *ngIf="searchResult.totalCount"
+                class="d-flex justify-content-end"
+                [collectionSize]="searchResult.totalCount"
+                [(page)]="filter.currentPage"
+                [pageSize]="filter.limit"
+                (pageChange)="getData()"
+                [maxSize]="3"
+                [rotate]="true"
+                [boundaryLinks]="true"></ngb-pagination>

@@ -1,0 +1,88 @@
+<form #form="ngForm"
+      autocomplete="off">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label fs-14">{{ 'nomenclature.subordinate.name' | translate }}</label>
+            <nomenclature-select restUrl="Nomenclature/Institution"
+                                 [(ngModel)]="personDoctoral.subordinate"
+                                 (ngModelChange)="institutionChangeService.subordinateChange(personDoctoral, $event, 'subordinate', 'institution', 'institutionSpeciality')"
+                                 [filter]="{level: level.second, parentId: userDataService.isEmsUser() ? personDoctoral.institutionId : userDataService.userData.institution.id, getInstitutionsByPermissions: true}"
+                                 title="{{translateService.currentLang === 'bg' ? personDoctoral.subordinate?.name : personDoctoral.subordinate?.nameAlt }}"
+                                 textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                 [disabled]="!isEditMode || personDoctoral.id > 0"
+                                 name="subordinate">
+            </nomenclature-select>
+        </div>
+
+        <div class="col-md-8">
+            <label class="form-label fs-14">{{ 'nomenclature.doctoral.titleSingular' | translate }}</label>
+            <invalid-field [element]="institutionSpeciality"
+                           text="invalidFields.required"></invalid-field>
+            <nomenclature-select restUrl="Nomenclature/InstitutionSpeciality"
+                                 [(ngModel)]="personDoctoral.institutionSpeciality"
+                                 (keyPropertyChange)="personDoctoral.institutionSpecialityId = $event; personDoctoral.startDate = null; personDoctoral.endDate = null"
+                                 [filter]="{institutionId: personDoctoral.subordinateId || personDoctoral.institutionId, educationalQualificationAlias: doctorAlias, getInstitutionSpecialitiesByPermissions: true}"
+                                 textTemplate="{speciality.code} {speciality.name} - {speciality.educationalQualification.name} - {educationalForm.name} - {duration} год."
+                                 [disabled]="!isEditMode || !personDoctoral.institutionId || personDoctoral.id > 0"
+                                 #institutionSpeciality="ngModel"
+                                 name="institutionSpeciality"
+                                 [required]="true">
+            </nomenclature-select>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label fs-14">{{ 'nomenclature.admissionReason.titleSingular' | translate }}</label>
+            <invalid-field [element]="admissionReason"
+                           text="invalidFields.required"></invalid-field>
+            <nomenclature-select restUrl="Nomenclature/AdmissionReason"
+                                 [(ngModel)]="personDoctoral.admissionReason"
+                                 (keyPropertyChange)="personDoctoral.admissionReasonId = $event"
+                                 title="{{translateService.currentLang === 'bg' ? personDoctoral.admissionReason?.name : personDoctoral.admissionReason?.nameAlt }}"
+                                 [filter]="{ euCountry: currentPersonContext.citizenship?.euCountry || (currentPersonContext.secondCitizenship ? currentPersonContext.secondCitizenship?.euCountry : false), eeaCountry: currentPersonContext.citizenship?.eeaCountry || (currentPersonContext.secondCitizenship ? currentPersonContext.secondCitizenship?.eeaCountry : false), citizenshipId: currentPersonContext.citizenship?.id, secondCitizenshipId: currentPersonContext.secondCitizenship?.id, studentType: studentType.doctorals }"
+                                 textTemplate="{{translateService.currentLang === 'bg' ? '{id} - {name}' : '{id} - {nameAlt}'}}"
+                                 [disabled]="!isEditMode || personDoctoral?.semesters?.length > 1"
+                                 #admissionReason="ngModel"
+                                 name="admissionReason"
+                                 [required]="true">
+            </nomenclature-select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fs-14">{{ 'rdpzsd.personDoctoral.startDate' | translate }}</label>
+            <invalid-field [element]="startDate"
+                           text="invalidFields.required"></invalid-field>
+            <date-time [(ngModel)]="personDoctoral.startDate"
+                       (ngModelChange)="calculateEndDate($event)"
+                       name="startDate"
+                       #startDate="ngModel"
+                       [required]="true"
+                       [disabled]="!isEditMode"></date-time>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fs-14">{{ 'rdpzsd.personDoctoral.endDate' | translate }}</label>
+            <date-time [(ngModel)]="personDoctoral.endDate"
+                       name="endDate"
+                       [disabled]="!isEditMode"></date-time>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-2">
+        <collapsable-label heading="rdpzsd.personPreviousEducation.title"
+                           fontSize="fs-16"
+                           secondIcon="{{ isHighSchoolNotFromRegister ? 'fas fa-exclamation-triangle ms-1 text-orange fs-16' : null }}"
+                           ngbTooltipClass="{{ (isHighSchoolNotFromRegister ? 'rdpzsd.personPreviousEducation.prevEducationHighSchoolHint' : null) | translate}}"
+                           iconTooltipClass="{{ isHighSchoolNotFromRegister ? 'primary-tooltip' : null }}"
+                           [isCollapsed]="!isEditMode || personDoctoral.id > 0">
+            <person-previous-education body
+                                       [part]="personDoctoral"
+                                       (highSchoolNotFromRegisterEmitter)="setHighSchoolNotFromRegister($event)"
+                                       [isEditMode]="isEditMode"
+                                       [disabledPeType]="true"
+                                       [isDoctoral]="true">
+            </person-previous-education>
+        </collapsable-label>
+    </div>
+</form>

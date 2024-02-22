@@ -1,0 +1,8 @@
+<div *ngIf="loadingText"
+     class="mt-{{marginSize}} mb-2 d-flex justify-content-center align-items-center">
+  <span class="fs-20 fw-600">{{ loadingText | translate }}</span>
+</div>
+
+<div class="mb-{{marginSize}} d-flex justify-content-center align-items-center">
+  <i class="fa fa-spinner fa-pulse fa-spin {{iconSize}}"></i>
+</div>

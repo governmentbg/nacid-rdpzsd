@@ -1,0 +1,26 @@
+<nav>
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a [routerLink]="['/rdpzsd']"
+         class="no-text-decoration">
+        <span class="fas fa-home text-blue"></span>
+        <span class="breadcrumb-item active ms-1">{{ 'root.header.rdpzsd' | translate }}</span>
+      </a>
+    </li>
+    <li *ngFor="let breadcrumb of breadcrumbItems; let i = index"
+        [ngClass]="{'active': i + 1 === breadcrumbItems.length}"
+        class="breadcrumb-item">
+      <a *ngIf="i + 1 < breadcrumbItems.length"
+         style="color: #135496"
+         class="no-text-decoration"
+         [routerLink]="[breadcrumb.url]">
+        <span class="text-blue">{{ breadcrumb.label }}</span>
+      </a>
+
+      <span *ngIf="i + 1 === breadcrumbItems.length"
+            class="underline">
+        {{ breadcrumb.label }}
+      </span>
+    </li>
+  </ol>
+</nav>

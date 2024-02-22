@@ -1,0 +1,36 @@
+<div class="modal-header modal-header-background ft-upper ">
+    <strong>
+        {{ 'rdpzsd.personStudent.stickers.notes' | translate }}
+    </strong>
+    <div class="btn-group">
+        <sync-button btnClass="btn btn-sm btn-outline-primary"
+                     [click]="close"
+                     [clickContext]="this"
+                     text="{{ 'root.buttons.close' | translate }}">
+        </sync-button>
+    </div>
+</div>
+<div class="modal-body p-3">
+    <ng-template ngFor
+                 let-stickerNote
+                 [ngForOf]="sortNotes()"
+                 let-i="index">
+        <div [class.mt-4]="i !== 0">
+            <collapsable-label heading="{{ stickerNote.actionDate | date: 'dd.MM.yyyy' }} - {{ stickerNote.userFullname }} {{ stickerNote.institution !== null ? ' - ' + stickerNote.institution.shortName : null }}"
+                               fontSize="fs-16"
+                               [isCollapsed]="i !== 0">
+                <div body
+                     class="row g-3">
+                    <div class="col-md-12">
+                        <div class="input-group input-group-sm">
+                            <textarea class="form-control form-control-sm form-control-invalid"
+                                      [(ngModel)]="stickerNote.note"
+                                      disabled>
+                        </textarea>
+                        </div>
+                    </div>
+                </div>
+            </collapsable-label>
+        </div>
+    </ng-template>
+</div>

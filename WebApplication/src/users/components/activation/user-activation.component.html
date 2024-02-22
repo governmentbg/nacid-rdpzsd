@@ -1,0 +1,66 @@
+<div class="container">
+  <div class="card no-border shadow padding-top-bottom-md">
+    <div class="card-body">
+      <h4 class="user-activation-text mb-4 font-weight-normal">
+        {{ 'user.activation' | translate }}
+      </h4>
+      <form #activationForm="ngForm">
+        <div class="row">
+          <div class="form-group col-sm-4 offset-sm-4 mt-2">
+            <input #password="ngModel"
+                   type="password"
+                   placeholder="{{ 'user.password' | translate }}"
+                   class="form-control"
+                   passwordSymbolsValidation
+                   [(ngModel)]="userActivationDto.password"
+                   name="password" />
+          </div>
+
+          <div class="form-group col-sm-4 offset-sm-4 mt-3">
+            <input type="password"
+                   placeholder="{{ 'user.passwordRepeat' | translate }}"
+                   class="form-control"
+                   passwordSymbolsValidation
+                   [(ngModel)]="userActivationDto.password2"
+                   name="password2" />
+          </div>
+
+          <div class="col-sm-4 offset-sm-4 mt-3">
+            <sync-button [click]="activate"
+                         [clickContext]="this"
+                         text="user.activate"
+                         btnClass="btn btn-primary w-100"
+                         [showTextOnPending]="false"
+                         [disabled]="activationForm.invalid">
+            </sync-button>
+          </div>
+
+          <div class="col-sm-4 offset-sm-4 mt-3 return-to-login">
+            <a [routerLink]="['/login']">{{ 'user.returnToLogin' | translate }}</a>
+          </div>
+
+          <div class="col-sm-4 offset-sm-4 mt-3"
+               *ngIf="userActivationDto.password && userActivationDto.password2 && userActivationDto.password !== userActivationDto.password2">
+            <div class="text-red">
+              <label class="control-label">
+                {{ 'user.notSamePasswords' | translate }}
+              </label>
+            </div>
+          </div>
+
+          <div class="col-sm-4 offset-sm-4 mt-3"
+               *ngIf="password && password.touched && password.invalid">
+            <div class="text-red">
+              <label class="control-label">
+                {{ 'user.passwordSymbolsLength' | translate }}
+              </label>
+              <label class="control-label">
+                {{ 'user.passwordSymbolsSpecification' | translate }}
+              </label>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

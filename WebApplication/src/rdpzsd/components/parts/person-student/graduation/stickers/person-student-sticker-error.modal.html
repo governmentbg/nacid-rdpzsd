@@ -1,0 +1,94 @@
+<div class="modal-header modal-header-background ft-upper ">
+    <strong>
+        {{ 'rdpzsd.personStudent.stickers.modalTitle' | translate }}
+    </strong>
+    <div class="btn-group">
+        <sync-button btnClass="btn btn-sm btn-outline-primary"
+                     [click]="close"
+                     [clickContext]="this"
+                     text="{{ 'root.buttons.close' | translate }}">
+        </sync-button>
+    </div>
+</div>
+<div class="modal-body p-3">
+    <div>
+        <collapsable-label heading="rdpzsd.personStudent.stickers.missingSemesters"
+                           fontSize="fs-16"
+                           [isCollapsed]="!stickerErrorDto.missingStudentSemesters || stickerErrorDto.missingStudentSemesters.length < 1">
+            <table body
+                   class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th class="col-12">{{ 'rdpzsd.personStudent.course' | translate }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container
+                                  *ngIf="stickerErrorDto.missingStudentSemesters && stickerErrorDto.missingStudentSemesters.length > 0; else noMissingStudentSemester">
+                        <ng-template ngFor
+                                     let-missingStudentSemester
+                                     [ngForOf]="stickerErrorDto.missingStudentSemesters"
+                                     let-i="index">
+                            <tr>
+                                <td class="col-12">
+                                    {{ 'enums.courseType.' + courseType[missingStudentSemester.course] + 'Short' |
+                                    translate }} - {{ 'enums.semester.' +
+                                    semesterType[missingStudentSemester.studentSemester] + 'Short' | translate }}
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </ng-container>
+                    <ng-template #noMissingStudentSemester>
+                        <tr>
+                            <td class="col-12">
+                                <i>{{ 'rdpzsd.personStudent.stickers.noErrors' | translate }}</i>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </tbody>
+            </table>
+        </collapsable-label>
+    </div>
+
+    <div class="mt-4">
+        <collapsable-label heading="rdpzsd.personStudent.stickers.otherErrors"
+                           fontSize="fs-16"
+                           [isCollapsed]="!stickerErrorDto.otherErrors || stickerErrorDto.otherErrors.length < 1">
+            <table body
+                   class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th class="col-12">{{ 'rdpzsd.personStudent.stickers.description' | translate }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container
+                                  *ngIf="stickerErrorDto.otherErrors && stickerErrorDto.otherErrors.length > 0; else noOtherErrors">
+                        <ng-template ngFor
+                                     let-otherError
+                                     [ngForOf]="stickerErrorDto.otherErrors"
+                                     let-i="index">
+                            <tr>
+                                <td class="col-12">
+                                    <span *ngIf="translateService.currentLang === 'bg'">
+                                        {{otherError.error}}
+                                    </span>
+                                    <span *ngIf="translateService.currentLang === 'en'">
+                                        {{otherError.errorAlt}}
+                                    </span>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </ng-container>
+                    <ng-template #noOtherErrors>
+                        <tr>
+                            <td class="col-12">
+                                <i>{{ 'rdpzsd.personStudent.stickers.noErrors' | translate }}</i>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </tbody>
+            </table>
+        </collapsable-label>
+    </div>
+</div>

@@ -1,0 +1,8 @@
+<div *ngFor="let item of options"
+     class="options-item"
+     [class.options-item-selected]="is(item)"
+     (click)="selectOption(item, $event)">
+  <span *ngIf="!translateName"
+        [innerHtml]="item | nomenclaturePipe: textTemplate"></span>
+  <span *ngIf="translateName">{{ item.name | translate }}</span>
+</div>

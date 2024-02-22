@@ -1,0 +1,154 @@
+<collapsable-section heading="{{ part?.institution 
+    ? part?.institution?.shortName + (part?.institutionSpeciality?.speciality 
+    ? ' - ' + part?.institutionSpeciality?.speciality?.name + ' - ' + part?.institutionSpeciality?.speciality?.educationalQualification?.name + ' - ' + part?.institutionSpeciality?.educationalForm?.name + ' - ' + part?.institutionSpeciality?.duration + ' год.'
+      : '')
+    : '' }}"
+                     [disabled]="currentPersonContext.isInEdit"
+                     [(isCollapsed)]="collapsed">
+
+    <person-semester-subheader *ngIf="part"
+                               subHeader
+                               [studentStatus]="part.studentStatus"
+                               [studentEvent]="part.studentEvent">
+    </person-semester-subheader>
+
+    <div *ngIf="personLotId && part"
+         buttons
+         class="d-flex align-items-center">
+        <part-actions *ngIf="(userDataService.isEmsUser() 
+                                || (userDataService.isRsdUser() && part.institutionId === userDataService.userData.institution.id && userDataService.userData?.institution?.hasDoctoral))
+                            && personLotState === lotState.actual"
+                      [model]="part"
+                      (modelChange)="modelChange($event)"
+                      [(isEditMode)]="isEditMode"
+                      [invalidForm]="!isValidForm"
+                      [hideEditActions]="!configuration.enableFullFunctionality || part.studentStatus?.alias === studentStatusGraduated || collapsed || !userDataService.isRsdUser()"
+                      [enableErase]="part?.semesters?.length === 1"
+                      (showHistoryEvent)="showHistory($event)"
+                      restUrl="PersonDoctoral">
+        </part-actions>
+    </div>
+
+    <person-doctoral *ngIf="part"
+                     body
+                     [personDoctoral]="part"
+                     [isEditMode]="isEditMode"
+                     [(isValidForm)]="isValidForm">
+    </person-doctoral>
+
+    <div *ngIf="part"
+         class="mt-3"
+         body>
+        <collapsable-label heading="rdpzsd.personSemester.doctoralTitle"
+                           fontSize="fs-16"
+                           [isCollapsed]="part.studentStatus?.alias === studentStatusGraduated || part.studentStatus?.alias === studentStatusProcessGraduation"
+                           [disabled]="part.studentStatus?.alias !== studentStatusGraduated && part.studentStatus?.alias !== studentStatusProcessGraduation">
+            <div buttons
+                 *ngIf="part.semesters[0] && part?.id && !currentPersonContext.isInEdit
+                           && configuration.enableFullFunctionality
+                           && personLotState === lotState.actual
+                           && part?.state === partState.actual
+                           && part?.studentStatus?.alias !== studentStatusGraduated
+                           && userDataService.isRsdUser() 
+                           && part?.institutionId === userDataService.userData.institution.id 
+                           && userDataService.userData?.institution?.hasDoctoral">
+                <div class="d-flex justify-content-center">
+                    <sync-button *ngIf="part.semesters[0].studentStatus?.alias === studentStatusActive || part.semesters[0].studentStatus?.alias === studentStatusInterrupted || part.semesters[0].studentStatus?.alias === studentStatusProcessGraduation"
+                                 btnClass="btn btn-primary btn-sm ms-2"
+                                 text="Приключване"
+                                 [click]="nextSemester"
+                                 [clickParams]="[studentStatusCompleted]"
+                                 [clickContext]="this">
+                    </sync-button>
+
+                    <sync-button *ngIf="part.semesters[0].studentStatus?.alias === studentStatusActive || part.semesters[0].studentStatus?.alias === studentStatusInterrupted"
+                                 btnClass="btn btn-danger btn-sm ms-2"
+                                 text="Прекъсване"
+                                 [click]="nextSemester"
+                                 [clickParams]="[studentStatusInterrupted]"
+                                 [clickContext]="this">
+                    </sync-button>
+
+                    <sync-button *ngIf="part.semesters[0].studentStatus?.alias === studentStatusActive || part.semesters[0].studentStatus?.alias === studentStatusInterrupted"
+                                 btnClass="btn btn-primary btn-sm ms-2"
+                                 titleText="Атестация, заминал по мобилност, удължен срок"
+                                 text="root.buttons.doctoralSemesterNewEvent"
+                                 [click]="nextSemester"
+                                 [clickParams]="[studentStatusActive]"
+                                 [clickContext]="this">
+                    </sync-button>
+
+                    <sync-button *ngIf="part.semesters[0].studentStatus?.alias === studentStatusActive || part.semesters[0].studentStatus?.alias === studentStatusProcessGraduation"
+                                 btnClass="btn btn-primary btn-sm ms-2"
+                                 [text]="part.semesters[0].studentStatus?.alias === studentStatusActive ? 'Отчисляване' : 'Отлагане на дипломиране'"
+                                 [click]="nextSemester"
+                                 [clickParams]="[studentStatusProcessGraduation]"
+                                 [clickContext]="this">
+                    </sync-button>
+                </div>
+            </div>
+
+            <table body
+                   class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th class="col-1-5">{{ 'nomenclature.studentStatus.name' | translate }}</th>
+                        <th class="col-3">{{ 'nomenclature.studentEvent.name' | translate }}</th>
+                        <th class="col-2">{{ 'rdpzsd.personSemester.yearType' | translate }}</th>
+                        <th class="col-2">{{ 'rdpzsd.personSemester.protocolNumber' | translate }}</th>
+                        <th class="col-2">{{ 'rdpzsd.personSemester.protocolDate' | translate }}</th>
+                        <th class="col-1-5 center-text-th">
+                            {{ 'root.results.actions' | translate }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-template ngFor
+                                 let-semester
+                                 [ngForOf]="part.semesters"
+                                 let-i="index">
+                        <tr person-doctoral-semester
+                            #semesterComponent
+                            [semester]="semester"
+                            [personStudentStatusAlias]="part?.studentStatus?.alias"
+                            [personLotState]="personLotState"
+                            [partState]="part?.state"
+                            [partId]="part?.id"
+                            [institutionId]="part?.institutionId"
+                            [educationalQualificationId]="part?.institutionSpeciality?.speciality?.educationalQualificationId"
+                            [semesterIndex]="i"
+                            [doctoralDuration]="part?.institutionSpeciality?.duration"
+                            [enablePeriodAndEventEdit]="part?.semesters?.length === 1"
+                            [admissionReason]="part?.admissionReason"
+                            (removeSemester)="removeSemester(i)"
+                            (updateSemester)="updateSemester(i, $event)"
+                            [class.bc-yellow]="semesterComponent.isEditMode && part?.id > 0">
+                        </tr>
+
+                        <tr *ngIf="semester.relocatedFromPart && semesterComponent && !semesterComponent.isEditMode">
+                            <td colspan="6">
+                                <label class="form-label fs-14">{{ 'rdpzsd.personSemester.relocatedFromPart' |
+                                    translate
+                                    }}</label>:
+                                ({{semester.relocatedFromPart.institution.shortName}} -
+                                {{semester.relocatedFromPart.subordinate.name}})
+                                {{semester.relocatedFromPart.institutionSpeciality.speciality.name}} -
+                                {{semester.relocatedFromPart.studentEvent.name}}
+                            </td>
+                        </tr>
+
+                        <tr *ngIf="semesterComponent && !semesterComponent.isEditMode
+                            && (semester?.studentStatus?.alias === studentStatusActive || semester.note)">
+                            <td *ngIf="semester.note"
+                                colspan="6">
+                                <label class="form-label fs-14 fw-bold">{{ 'rdpzsd.personSemester.note' | translate
+                                    }}</label>:
+                                {{ semester.note }}
+                            </td>
+                        </tr>
+                    </ng-template>
+                </tbody>
+            </table>
+        </collapsable-label>
+    </div>
+</collapsable-section>

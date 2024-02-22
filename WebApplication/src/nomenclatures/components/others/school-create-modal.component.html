@@ -1,0 +1,142 @@
+<div class="modal-header modal-header-background ft-upper ">
+    <strong>
+        {{ 'rdpzsd.personSecondary.schoolNew' | translate }}
+    </strong>
+    <div class="btn-group">
+        <sync-button *ngIf="school.isEditMode"
+                    btnClass="btn btn-success btn-sm ms-2"
+                    icon="fas fa-save"
+                    [click]="save"
+                    titleText="{{ 'root.buttons.save' | translate }}"
+                    [clickParams]="[school]"
+                    [clickContext]="this">
+        </sync-button>
+
+        <sync-button *ngIf="school.isEditMode"
+                    btnClass="btn btn-danger btn-sm ms-2"
+                    icon="fas fa-times"
+                    [click]="cancel"
+                    titleText="{{ 'root.buttons.cancel' | translate }}"
+                    [clickContext]="this">
+        </sync-button>
+    </div>
+</div>
+<form #form="ngForm">
+    <div class="modal-body p-3">
+         <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'nomenclature.name' | translate }}</label>
+                <invalid-field [element]="schoolName"
+                                text="invalidFields.noLatinRequired"></invalid-field>
+                <input type="text"
+                       #schoolName="ngModel"
+                       name="schoolName"
+                       [required]="true"
+                       maxlength="255"
+                       minlength="7"
+                       customRegexValidation
+                       patternName="schoolNameRegex"
+                       class="form-control form-control-sm form-control-invalid"
+                       [(ngModel)]="school.name">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'nomenclature.school.type' | translate }}</label>
+                <invalid-field [element]="type"
+                               text="invalidFields.required"></invalid-field>
+                <enum-select [(ngModel)]="school.type"
+                             enumName="schoolType"
+                             #type="ngModel"
+                             name="type"
+                             [required]="true"
+                             [enumType]="schoolType"></enum-select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'nomenclature.school.ownershipType' | translate }}</label>
+                <invalid-field [element]="ownershipType"
+                               text="invalidFields.required"></invalid-field>
+                <enum-select [(ngModel)]="school.ownershipType"
+                             enumName="schoolOwnershipType"
+                             #ownershipType="ngModel"
+                             name="ownershipType"
+                             [required]="true"
+                             [enumType]="schoolOwnershipType"></enum-select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'nomenclature.school.state' | translate }}</label>
+                <invalid-field [element]="state"
+                               text="invalidFields.required"></invalid-field>
+                <enum-select [(ngModel)]="school.state"
+                             enumName="schoolState"
+                             (ngModelChange)="changeSchoolState($event)"
+                             #state="ngModel"
+                             name="state"
+                             [required]="true"
+                             [enumType]="schoolState"></enum-select>
+            </div>
+        </div>
+
+        <div *ngIf="school.state === schoolState.renamed" class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.school' | translate }}</label>
+                <invalid-field [element]="parent"
+                               text="invalidFields.required"></invalid-field>
+                <nomenclature-select restUrl="Nomenclature/School"
+                                     name="parent"
+                                     #parent="ngModel"
+                                     [(ngModel)]="school.parent"
+                                     (keyPropertyChange)="school.parentId = $event"
+                                     [required]="school.state === schoolState.renamed">
+                </nomenclature-select>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label fs-14">{{ 'nomenclature.district.name' | translate }}</label>
+                <invalid-field [element]="district"
+                                text="invalidFields.required"></invalid-field>
+                <nomenclature-select restUrl="Nomenclature/District"
+                                     [(ngModel)]="school.district"
+                                     name="district"
+                                     #district="ngModel"
+                                     [required]="true"
+                                     (ngModelChange)="settlementChangeService.districtChange(school, $event, 'district', 'municipality', 'settlement')"
+                                     textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                </nomenclature-select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fs-14">{{ 'nomenclature.municipality.name' | translate }}</label>
+                <invalid-field [element]="municipality"
+                                text="invalidFields.required"></invalid-field>
+                <nomenclature-select restUrl="Nomenclature/Municipality"
+                                     name="municipality"
+                                     #municipality="ngModel"
+                                     [required]="true"
+                                     [(ngModel)]="school.municipality"
+                                     (ngModelChange)="settlementChangeService.municipalityChange(school, $event, 'municipality', 'district', 'settlement')"
+                                     [filter]="{districtId: school.districtId}"
+                                     textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                </nomenclature-select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fs-14">{{ 'nomenclature.settlement.name' | translate }}</label>
+                <invalid-field [element]="settlement"
+                                text="invalidFields.required"></invalid-field>
+                <nomenclature-select restUrl="Nomenclature/Settlement"
+                                     [(ngModel)]="school.settlement"
+                                     name="settlement"
+                                     #settlement="ngModel"
+                                     [required]="true"
+                                     (ngModelChange)="settlementChangeService.settlementChange(school, $event, 'settlement', 'district', 'municipality')"
+                                     [filter]="{districtId: school.districtId, municipalityId: school.municipalityId}"
+                                     textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                </nomenclature-select>
+            </div>
+        </div>
+    </div>
+</form>

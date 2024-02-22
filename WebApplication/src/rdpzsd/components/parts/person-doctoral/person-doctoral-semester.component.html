@@ -1,0 +1,350 @@
+<ng-container *ngIf="isEditMode">
+    <td colspan="6">
+        <form #form="ngForm"
+              autocomplete="off">
+            <div class="row g-3">
+                <div class="col-1-5">
+                    <nomenclature-select restUrl="Nomenclature/StudentStatus"
+                                         [(ngModel)]="semester.studentStatus"
+                                         (ngModelChange)="studentStatusChangeService.studentStatusChange(semester, $event, 'studentStatus', 'studentEvent')"
+                                         name="studentStatus"
+                                         [required]="true"
+                                         [disabled]="true">
+                    </nomenclature-select>
+                </div>
+
+                <div class="col-md-3">
+                    <nomenclature-select restUrl="Nomenclature/StudentEvent"
+                                         [ngModel]="semester.studentEvent"
+                                         (ngModelChange)="studentEventChanged($event)"
+                                         [filter]="{studentStatusId: semester.studentStatusId,
+                                           educationalQualificationId: educationalQualificationId,
+                                           studentEventAliases: (!partId || enablePeriodAndEventEdit)
+                                              ? studentInitialActiveEvents
+                                              : (semester.studentStatus?.alias === studentStatusActive && semester.lastSemesterStudentStatusAlias === studentStatusActive)
+                                                ? studentActiveEvents
+                                                : (semester.studentStatus?.alias === studentStatusActive && semester.lastSemesterStudentStatusAlias === studentStatusInterrupted)
+                                                    ? studentActiveAfterBreakEvents
+                                                    : semester.studentStatus?.alias === studentStatusProcessGraduation
+                                                        ? studentProcessGraduationEvents
+                                                        : []}"
+                                         name="studentEvent"
+                                         [required]="true"
+                                         [disabled]="(semester.id > 0 && !enablePeriodAndEventEdit) 
+                                            || !educationalQualificationId
+                                            || semester?.studentEvent?.alias === studentEventDeductedWithDefense"
+                                         [allowClear]="false">
+                    </nomenclature-select>
+                </div>
+
+                <div class="col-md-2">
+                    <enum-select [(ngModel)]="semester.yearType"
+                                 enumName="yearType"
+                                 name="year"
+                                 #year="ngModel"
+                                 [required]="true"
+                                 [allowClear]="false"
+                                 [excludeEnumArray]="excludeYearsArray"
+                                 [enumType]="yearType"
+                                 [disabled]="semester.studentEvent?.alias === studentEventInitialRegistration
+                                    || semesterIndex !== 0  
+                                    || semester.studentStatus?.alias === studentStatusProcessGraduation
+                                    || !doctoralDuration"
+                                 [showSearchBox]="true"></enum-select>
+                </div>
+
+                <div class="col-md-2">
+                    <input type="text"
+                           class="form-control form-control-sm form-control-invalid"
+                           [(ngModel)]="semester.protocolNumber"
+                           name="protocolNumber"
+                           maxlength="15"
+                           noWhiteSpacesValidation />
+                </div>
+
+                <div class="col-md-2">
+                    <date-time [(ngModel)]="semester.protocolDate"
+                               name="protocolDate"
+                               [required]="true"
+                               [disabled]="semester.id > 0"
+                               [allowClear]="false"></date-time>
+                </div>
+
+                <div *ngIf="semester && partId
+                    && configuration.enableFullFunctionality
+                    && personLotState === lotState.actual
+                    && partState === partStateType.actual
+                    && personStudentStatusAlias !== studentStatusGraduated
+                    && userDataService.isRsdUser() 
+                    && institutionId === userDataService.userData.institution.id 
+                    && userDataService.userData?.institution?.hasDoctoral"
+                     class="d-flex justify-content-center col-1-5">
+                    <sync-button btnClass="btn btn-success btn-sm ms-2"
+                                 icon="fas fa-save"
+                                 titleText="{{ 'root.buttons.save' | translate }}"
+                                 [disabled]="form.invalid"
+                                 [click]="save"
+                                 [clickContext]="this">
+                    </sync-button>
+
+                    <sync-button *ngIf="semesterIndex === 0 && semester.id"
+                                 titleText="Изтриване"
+                                 btnClass="btn btn-danger btn-sm ms-2"
+                                 icon="fas fa-trash"
+                                 [click]="delete"
+                                 [clickContext]="this">
+                    </sync-button>
+
+                    <sync-button btnClass="btn btn-danger btn-sm ms-2"
+                                 icon="fas fa-times"
+                                 titleText="{{ 'root.buttons.cancel' | translate }}"
+                                 [click]="cancel"
+                                 [clickContext]="this">
+                    </sync-button>
+                </div>
+            </div>
+
+            <div class="row g-3"
+                 *ngIf="semester.studentEvent?.alias === studentEventAfterRelocation">
+                <div class="col-12">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personSemester.relocatedFromPart' | translate }}</label>
+                    <nomenclature-select restUrl="PersonLot/PersonDoctoral/SearchDto"
+                                         [(ngModel)]="semester.relocatedFromPart"
+                                         (keyPropertyChange)="semester.relocatedFromPartId = $event"
+                                         [filter]="{lotId: currentUserContext.personLotId, studentStatusAlias: studentStatusCompleted, studentEventAlias: studentEventRelocation, excludeId: partId}"
+                                         name="relocatedFromPart"
+                                         textTemplate="({institution.shortName} - {subordinate.name}) {institutionSpeciality.speciality.name} - {studentEvent.name}"
+                                         [required]="true">
+                    </nomenclature-select>
+                </div>
+            </div>
+
+            <div class="row g-3"
+                 *ngIf="semester.studentEvent?.alias === studentEventAfterRelocation || semester.studentEvent?.alias === studentEventAfterRelocationAbroad">
+                <div class="col-md-5">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personSemester.documentOfRecognition' |
+                        translate}}</label>
+                    <file-upload #semesterRelocatedFile="ngModel"
+                                 name="semesterRelocatedFile"
+                                 [required]="true"
+                                 [formControlClass]="semesterRelocatedFile.invalid  ? 'form-control form-control-sm form-control-invalid-static' : 'form-control form-control-sm'"
+                                 [disabled]="(partId > 0 && !enablePeriodAndEventEdit) || !configuration.enableFullFunctionality"
+                                 [(ngModel)]="semester.semesterRelocatedFile">
+                    </file-upload>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personSemester.recognitionNumber' | translate}}</label>
+                    <invalid-field [element]="semesterRelocatedNumber"
+                                   text="invalidFields.required"></invalid-field>
+                    <input type="text"
+                           class="form-control form-control-sm form-control-invalid"
+                           [(ngModel)]="semester.semesterRelocatedNumber"
+                           name="semesterRelocatedNumber"
+                           [disabled]="partId > 0 && !enablePeriodAndEventEdit"
+                           [required]="true"
+                           maxLength="30"
+                           #semesterRelocatedNumber="ngModel" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personSemester.recognitionDate' | translate}}</label>
+                    <invalid-field [element]="semesterRelocatedDate"
+                                   text="invalidFields.required"></invalid-field>
+                    <date-time [(ngModel)]="semester.semesterRelocatedDate"
+                               name="semesterRelocatedDate"
+                               [disabled]="partId > 0 && !enablePeriodAndEventEdit"
+                               [required]="true"
+                               [formControlClass]="semesterRelocatedDate.invalid && semesterRelocatedDate.value === null ? 'form-control form-control-sm form-control-invalid-static' : 'form-control form-control-sm'"
+                               [useEndYear]="true"
+                               #semesterRelocatedDate="ngModel"></date-time>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div *ngIf="semester?.studentEvent?.alias === studentEventAttestation"
+                     class="col-1-5">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personSemester.attestation' | translate }}</label>
+                    <enum-select [(ngModel)]="semester.attestationType"
+                                 enumName="attestationType"
+                                 name="attestation"
+                                 #attestation="ngModel"
+                                 [required]="true"
+                                 [allowClear]="false"
+                                 [enumType]="attestationType"
+                                 [showSearchBox]="true"></enum-select>
+                </div>
+                <div *ngIf="semester?.studentStatus?.alias === studentStatusActive"
+                     class="col-md-2">
+                    <label class="form-label fs-14">{{ 'nomenclature.educationFeeType.shortTitle' | translate }}</label>
+                    <nomenclature-select restUrl="Nomenclature/EducationFeeType"
+                                         [(ngModel)]="semester.educationFeeType"
+                                         (keyPropertyChange)="semester.educationFeeTypeId = $event"
+                                         [filter]="{ admissionReasonId: !partId ? admissionReason?.id : null }"
+                                         name="educationFeeType"
+                                         [allowClear]="false"
+                                         [disabled]="partId > 0 && semester.studentEvent?.alias !== studentEventChangeEducationFeeType"
+                                         [required]="semester.studentStatus && semester.studentStatus.alias === studentStatusActive">
+                    </nomenclature-select>
+                </div>
+
+                <div [ngClass]="{'col-8-5': semester?.studentEvent?.alias === studentEventAttestation,
+                                 'col-md-10': semester?.studentEvent?.alias !== studentEventAttestation, 
+                                 'col-md-12': semester?.studentStatus.alias === studentStatusCompleted}">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personSemester.note' | translate }}</label>
+                    <input type="text"
+                           class="form-control form-control-sm form-control-invalid"
+                           [(ngModel)]="semester.note"
+                           maxlength="500"
+                           name="note" />
+                </div>
+
+            </div>
+
+            <div class="d-flex"
+                 *ngIf="semester.studentStatus?.alias === studentStatusActive 
+                    || semester.studentStatus?.alias === studentStatusInterrupted
+                    || semester.studentStatus?.alias === studentStatusProcessGraduation">
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input cursor-pointer"
+                               type="checkbox"
+                               id="hasScholarship"
+                               name="hasScholarship"
+                               [(ngModel)]="semester.hasScholarship">
+                        <label class="form-check-label cursor-pointer"
+                               for="hasScholarship">
+                            {{ 'rdpzsd.personSemester.hasScholarship' | translate }}
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input cursor-pointer"
+                               type="checkbox"
+                               id="useHostel"
+                               name="useHostel"
+                               [(ngModel)]="semester.useHostel">
+                        <label class="form-check-label cursor-pointer"
+                               for="useHostel">
+                            {{ 'rdpzsd.personSemester.useHostel' | translate }}
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input cursor-pointer"
+                               type="checkbox"
+                               id="useHolidayBase"
+                               name="useHolidayBase"
+                               [(ngModel)]="semester.useHolidayBase">
+                        <label class="form-check-label cursor-pointer"
+                               for="useHolidayBase">
+                            {{ 'rdpzsd.personSemester.useHolidayBase' | translate }}
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-check">
+                        <input class="form-check-input cursor-pointer"
+                               type="checkbox"
+                               id="participatedIntPrograms"
+                               name="participatedIntPrograms"
+                               [(ngModel)]="semester.participatedIntPrograms">
+                        <label class="form-check-label cursor-pointer"
+                               for="participatedIntPrograms">
+                            {{ 'rdpzsd.personSemester.participatedIntPrograms' | translate }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </td>
+</ng-container>
+
+<ng-container *ngIf="!isEditMode">
+    <td>
+        <div [ngClass]="{'text-red': semesterIndex === 0 && semester.studentStatus?.alias === studentStatusInterrupted,
+        'text-green': semesterIndex === 0 && semester.studentStatus?.alias == studentStatusActive}">
+            {{ semester.studentStatus.name }}
+        </div>
+
+        <div *ngIf="semester.studentStatus?.alias == studentStatusActive">
+            {{semester.educationFeeType?.name}}
+        </div>
+
+        <div *ngIf="semester.hasScholarship || semester.useHostel || semester.useHolidayBase || semester.participatedIntPrograms"
+             class="d-flex mt-3">
+            <div *ngIf="semester.hasScholarship"
+                 ngbTooltip="{{ 'rdpzsd.personSemester.hasScholarship' | translate }}"
+                 tooltipClass="primary-tooltip"
+                 class="fas fa-euro-sign fa-lg">
+            </div>
+
+            <div *ngIf="semester.useHostel"
+                 [ngClass]="{'ms-2': semester.hasScholarship}"
+                 ngbTooltip="{{ 'rdpzsd.personSemester.useHostel' | translate }}"
+                 tooltipClass="primary-tooltip"
+                 class="far fa-building fa-lg">
+            </div>
+
+            <div *ngIf="semester.useHolidayBase"
+                 [ngClass]="{'ms-2': semester.hasScholarship || semester.useHostel}"
+                 ngbTooltip="{{ 'rdpzsd.personSemester.useHolidayBase' | translate }}"
+                 tooltipClass="primary-tooltip"
+                 class="fas fa-umbrella-beach fa-lg">
+            </div>
+
+            <div *ngIf="semester.participatedIntPrograms"
+                 [ngClass]="{'ms-2': semester.hasScholarship || semester.useHostel || semester.useHolidayBase}"
+                 ngbTooltip="{{ 'rdpzsd.personSemester.participatedIntPrograms' | translate }}"
+                 tooltipClass="primary-tooltip"
+                 class="fas fa-globe-americas fa-lg">
+            </div>
+        </div>
+    </td>
+    <td>
+        <p [ngClass]="{'text-red': semester.attestationType === attestationType.negative }">{{
+            semester.studentEvent.name }}
+            <span *ngIf="semester.studentEvent?.alias === studentEventAttestation"> - {{ 'enums.attestationType.' +
+                attestationType[semester.attestationType] | translate }}</span>
+        </p>
+        <a *ngIf="semester.semesterRelocatedFile"
+           (click)="getRelocationFile()"
+           target="_blank"
+           style="cursor: pointer; text-decoration: none;"
+           class="text-overflow">{{ semester.semesterRelocatedNumber}}/{{ semester.semesterRelocatedDate | date:
+            'dd.MM.yyyy'}}</a>
+    </td>
+    <td>
+        {{ 'enums.yearType.' + yearType[semester.yearType] | translate }}
+    </td>
+    <td>
+        {{ semester.protocolNumber }}
+    </td>
+    <td>
+        {{ semester.protocolDate | date: 'dd.MM.yyyy' }}
+    </td>
+    <td class="center-text-td">
+        <div *ngIf="semester && partId && !currentUserContext.isInEdit
+                && configuration.enableFullFunctionality
+                && personLotState === lotState.actual
+                && partState === partStateType.actual
+                && personStudentStatusAlias !== studentStatusGraduated
+                && userDataService.isRsdUser() 
+                && institutionId === userDataService.userData.institution.id 
+                && userDataService.userData?.institution?.hasDoctoral">
+            <div class="d-flex justify-content-center mt-2">
+                <sync-button btnClass="btn btn-primary btn-sm ms-2"
+                             titleText="Редакция"
+                             icon="fas fa-pen"
+                             [click]="edit"
+                             [clickContext]="this">
+                </sync-button>
+            </div>
+        </div>
+    </td>
+</ng-container>

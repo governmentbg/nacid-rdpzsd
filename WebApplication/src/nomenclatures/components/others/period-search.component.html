@@ -1,0 +1,139 @@
+<div class="d-flex flex-row-reverse mt-4">
+    <div class="btn-group">
+        <sync-button *ngIf="userDataService.isEmsEditUser()"
+                     btnClass="btn btn-primary btn-sm"
+                     icon="fas fa-plus fa-sm"
+                     text="root.buttons.add"
+                     [click]="add"
+                     [clickContext]="this">
+        </sync-button>
+    </div>
+</div>
+
+<div class="table-scrollable">
+    <table class="table table-bordered mt-4">
+        <thead class="table-light">
+            <tr>
+                <th class="col-10">{{ 'nomenclature.period.titleSingular' | translate }}</th>
+                <th class="col-1 center-text-th">{{ 'nomenclature.isActive' | translate }}</th>
+                <th *ngIf="userDataService.isEmsEditUser()"
+                    class="col-1 center-text-th">{{ 'root.results.actions' | translate }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngIf="!loadingData; else loadingSection">
+                <ng-container *ngIf="searchResult.result && searchResult.result.length > 0; else noResults">
+                    <tr *ngFor="let period of searchResult.result">
+                        <td>
+                            <div *ngIf="period.id">{{ period.name }}</div>
+                            <form #periodForm="ngForm">
+                                <div class="d-flex g-3"
+                                     *ngIf="period.isEditMode && !period.id">
+                                    <div class="col-md-3">
+                                        <input type="number"
+                                               min="2013"
+                                               max="2050"
+                                               class="form-control form-control-sm form-control-invalid"
+                                               [(ngModel)]="period.year"
+                                               name="year"
+                                               required />
+                                    </div>
+
+                                    <div class="col-md-3 ms-2">
+                                        <enum-select [(ngModel)]="period.semester"
+                                                     name="semester"
+                                                     enumName="semester"
+                                                     [enumType]="semester"
+                                                     [required]="true"></enum-select>
+                                    </div>
+                                </div>
+                            </form>
+                        </td>
+                        <td class="center-text-td">
+                            <div *ngIf="!period.isEditMode">
+                                <span *ngIf="period.isActive"
+                                      class="fas fa-check"></span>
+                                <span *ngIf="!period.isActive"
+                                      class="fas fa-times"></span>
+                            </div>
+
+                            <div *ngIf="period.isEditMode">
+                                <input class="form-check-input cursor-pointer"
+                                       type="checkbox"
+                                       name="isActive"
+                                       [(ngModel)]="period.isActive">
+                            </div>
+                        </td>
+                        <td *ngIf="userDataService.isEmsEditUser()"
+                            class="center-text-td">
+                            <div class="btn-group">
+                                <!-- <sync-button *ngIf="period && period.id && !period.isEditMode"
+                                             btnClass="btn btn-primary btn-sm ms-2"
+                                             icon="fas fa-pen"
+                                             [click]="edit"
+                                             titleText="{{ 'root.buttons.edit' | translate }}"
+                                             [clickParams]="[period]"
+                                             [clickContext]="this">
+                                </sync-button>
+
+                                <sync-button *ngIf="period && period.id && !period.isEditMode"
+                                             btnClass="btn btn-danger btn-sm ms-2"
+                                             icon="fas fa-trash"
+                                             titleText="{{ 'root.buttons.delete' | translate }}"
+                                             [click]="delete"
+                                             [clickParams]="[period.id]"
+                                             [clickContext]="this">
+                                </sync-button> -->
+
+                                <sync-button *ngIf="period.isEditMode"
+                                             btnClass="btn btn-success btn-sm ms-2"
+                                             icon="fas fa-save"
+                                             [disabled]="periodForm.invalid"
+                                             [click]="save"
+                                             titleText="{{ 'root.buttons.save' | translate }}"
+                                             [clickParams]="[period]"
+                                             [clickContext]="this">
+                                </sync-button>
+
+                                <sync-button *ngIf="period.isEditMode"
+                                             btnClass="btn btn-danger btn-sm ms-2"
+                                             icon="fas fa-times"
+                                             [click]="cancel"
+                                             titleText="{{ 'root.buttons.cancel' | translate }}"
+                                             [clickParams]="[period]"
+                                             [clickContext]="this">
+                                </sync-button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+                <ng-template #noResults>
+                    <tr>
+                        <td [attr.colspan]="userDataService.isEmsEditUser() ? 4 : 3"
+                            class="col-12">
+                            <i>{{ 'root.results.noResults' | translate }}</i>
+                        </td>
+                    </tr>
+                </ng-template>
+            </ng-container>
+            <ng-template #loadingSection>
+                <tr>
+                    <td [attr.colspan]="userDataService.isEmsEditUser() ? 4 : 3"
+                        class="col-12">
+                        <loading-section></loading-section>
+                    </td>
+                </tr>
+            </ng-template>
+        </tbody>
+    </table>
+</div>
+
+<ngb-pagination *ngIf="searchResult.totalCount"
+                class="d-flex justify-content-end"
+                [collectionSize]="searchResult.totalCount"
+                [(page)]="filter.currentPage"
+                [pageSize]="filter.limit"
+                (pageChange)="getData()"
+                [maxSize]="3"
+                [rotate]="true"
+                [boundaryLinks]="true"></ngb-pagination>

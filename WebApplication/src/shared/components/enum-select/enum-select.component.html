@@ -1,0 +1,52 @@
+<div class="enum-select-container"
+     [class.cursor-pointer]="!disabled">
+  <!-- selected item and buttons -->
+  <div class="d-flex {{formControlClass}} selected-item"
+       [class.form-control-invalid-static]="!disabled && required && touched && !model && !selectOpened"
+       [class.disabled-select]="disabled">
+    <div class="d-flex w-100 justify-content-between">
+      <div>
+        <span *ngIf="model">
+          {{ 'enums.' + enumName + '.' + enumType[model] | translate }}
+        </span>
+      </div>
+
+      <div *ngIf="!disabled">
+        <span *ngIf="allowClear && model"
+              class="fa fa-times me-2"
+              (click)="clearSelection($event)"></span>
+        <span class="{{ selectOpened ? 'fa fa-chevron-up' : 'fa fa-chevron-down' }}"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- search -->
+  <div *ngIf="selectOpened"
+       class="search-box-container">
+    <div *ngIf="showSearchBox"
+         class="d-flex align-items-center">
+      <input type="text"
+             [autofocus]="true"
+             [autofocusDelay]="0"
+             class="{{formControlClass}} search-box"
+             [ngModel]="textFilter"
+             [disabled]="disabled"
+             (ngModelChange)="textFilterChange($event)">
+      <span class="search-icon-input fas fa-search fa-sm search-box"></span>
+    </div>
+
+    <div *ngIf="selectOpened"
+         class="d-flex {{formControlClass}} options-container border-top-0 flex-column"
+         [class.disabled-select]="disabled">
+      <div *ngFor="let option of options"
+           (click)="selectOption(option.value, $event)"
+           class="options-item">
+        <span>{{ option.name }}</span>
+      </div>
+      <div *ngIf="!options || options.length < 1"
+           class="mt-1 ms-2">
+        <span>{{ 'root.results.noItems' | translate }}</span>
+      </div>
+    </div>
+  </div>
+</div>

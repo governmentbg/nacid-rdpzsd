@@ -1,0 +1,16 @@
+<div ngbAutofocus></div>
+<ngb-carousel #carousel>
+    <ng-template ngFor
+                 let-image
+                 [ngForOf]="images"
+                 let-i="index">
+        <ng-template ngbSlide>
+            <div class="picsum-img-wrapper">
+                <img [src]="image"
+                     width="500"
+                     height="500"
+                     alt="Няма изображение.">
+            </div>
+        </ng-template>
+    </ng-template>
+</ngb-carousel>

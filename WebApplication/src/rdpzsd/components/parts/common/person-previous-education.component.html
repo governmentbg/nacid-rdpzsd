@@ -1,0 +1,353 @@
+<div class="row g-3">
+    <div class="col-md-2">
+        <label class="form-label fs-14">{{ 'rdpzsd.personPreviousEducation.educationType' | translate }}</label>
+        <invalid-field [element]="peTypeElement"
+                       text="invalidFields.required"></invalid-field>
+        <enum-select [(ngModel)]="part.peType"
+                     (ngModelChange)="peTypeChanged($event)"
+                     name="peTypeElement"
+                     enumName="previousEducationType"
+                     #peTypeElement="ngModel"
+                     [enumType]="previousEducationType"
+                     [disabled]="!isEditMode || disabledPeType"
+                     [required]="true"
+                     [allowClear]="false"></enum-select>
+    </div>
+
+    <div *ngIf="part.peType === previousEducationType.secondary"
+         class="col-md-9">
+        <person-previous-secondary-education [isEditMode]="isEditMode"
+                                             (personSecondaryEmitter)="setPersonSecondaryEmitter($event)">
+        </person-previous-secondary-education>
+    </div>
+
+    <div *ngIf="part.peType === previousEducationType.highSchool"
+         class="col-md-2">
+        <label class="form-label fs-14">{{ 'rdpzsd.personPreviousEducation.peHighSchoolType' | translate }}</label>
+        <invalid-field [element]="peHighSchoolTypeElement"
+                       text="invalidFields.required"></invalid-field>
+        <enum-select [(ngModel)]="part.peHighSchoolType"
+                     (ngModelChange)="peHighSchoolTypeChanged($event)"
+                     name="peHighSchoolTypeElement"
+                     enumName="previousHighSchoolEducationType"
+                     [excludeEnumArray]="(isDoctoral && currentPersonContext.graduatedMasterPersonStudentsCount < 1) || (!isDoctoral && currentPersonContext.graduatedPersonStudentsCount < 1)
+                        ? [previousHighSchoolEducationType.fromRegister] 
+                        : null"
+                     #peHighSchoolTypeElement="ngModel"
+                     [enumType]="previousHighSchoolEducationType"
+                     [disabled]="!isEditMode"
+                     [allowClear]="false"
+                     [required]="true"></enum-select>
+    </div>
+    <div *ngIf="part.peType === previousEducationType.highSchool && part.peHighSchoolType === previousHighSchoolEducationType.abroad"
+         class="col-md-3">
+        <label class="form-label fs-14">{{ 'rdpzsd.personPreviousEducation.acquiredForeignEducationalQualification' |
+            translate }}</label>
+        <invalid-field [element]="peAcquiredForeignEducationalQualification"
+                       text="invalidFields.required"></invalid-field>
+        <nomenclature-select restUrl="Nomenclature/EducationalQualification"
+                             [(ngModel)]="part.peAcquiredForeignEducationalQualification"
+                             (keyPropertyChange)="part.peAcquiredForeignEducationalQualificationId = $event"
+                             [filter]="{alias: doctor, excludeAlias: true, onlyMasters: isDoctoral}"
+                             #peAcquiredForeignEducationalQualification="ngModel"
+                             name="peAcquiredForeignEducationalQualification"
+                             [required]="true"
+                             [disabled]="!isEditMode">
+        </nomenclature-select>
+    </div>
+
+    <div class="col-md-3"
+         *ngIf="part.peType === previousEducationType.highSchool">
+        <label *ngIf="part.peHighSchoolType !== previousHighSchoolEducationType.abroad"
+               class="form-label fs-14">{{ 'nomenclature.educationalQualification.OKS' | translate }}</label>
+        <label *ngIf="part.peHighSchoolType === previousHighSchoolEducationType.abroad"
+               class="form-label fs-14">{{ 'rdpzsd.personPreviousEducation.recognizedEducationalQualification' |
+            translate }}</label>
+        <invalid-field [element]="peEducationalQualification"
+                       text="invalidFields.required"></invalid-field>
+        <nomenclature-select restUrl="Nomenclature/EducationalQualification"
+                             [(ngModel)]="part.peEducationalQualification"
+                             (keyPropertyChange)="part.peEducationalQualificationId = $event"
+                             [filter]="{alias: doctor, excludeAlias: true, onlyMasters: isDoctoral}"
+                             #peEducationalQualification="ngModel"
+                             name="peEducationalQualification"
+                             [required]="true"
+                             [disabled]="!isEditMode || part.peHighSchoolType === previousHighSchoolEducationType.fromRegister || (part.peHighSchoolType === previousHighSchoolEducationType.missingInRegister && !part.peSpecialityMissingInRegister)">
+        </nomenclature-select>
+    </div>
+
+    <div class="col-md-4"
+         *ngIf="part.peHighSchoolType === previousHighSchoolEducationType.missingInRegister && part.peType === previousEducationType.highSchool && isEditMode">
+        <input class="form-check-input cursor-pointer"
+               type="checkbox"
+               style="margin-top: 1.7rem;"
+               name="peSpecialityMissingInRegister"
+               [disabled]="!isEditMode"
+               [(ngModel)]="part.peSpecialityMissingInRegister"
+               (ngModelChange)="specialityFromRegisterChanged()">
+        <label class="form-check-label fs-15"
+               style="margin-top: 1.5rem; margin-left: 5px;">
+            {{'rdpzsd.personPreviousEducation.specialityMissingInRegister' | translate }}
+        </label>
+    </div>
+
+    <div *ngIf="part.peType === previousEducationType.highSchool 
+            && part.peHighSchoolType === previousHighSchoolEducationType.fromRegister
+            && isEditMode"
+         class="col-md-5">
+        <label class="form-label fs-14">{{ 'rdpzsd.personPreviousEducation.pePersonStudent' | translate }}</label>
+        <nomenclature-select restUrl="PersonLot/PersonStudent/SearchDto"
+                             [(ngModel)]="part.pePart"
+                             [disabled]="(isDoctoral && currentPersonContext.graduatedMasterPersonStudentsCount === 1) || (!isDoctoral && currentPersonContext.graduatedPersonStudentsCount === 1)"
+                             [filter]="{lotId: currentPersonContext.personLotId, studentStatusAlias: studentStatusGraduated, onlyMasters: isDoctoral, excludeId: part.id}"
+                             name="pePersonStudent"
+                             title="{{ part.pePart?.institution ? '(' : ''}}{{part.pePart?.institution?.shortName}} {{ part.pePart?.institution ? '-' : ''}} {{part.pePart?.subordinate?.name}}{{ part.pePart?.institution ? ')' : ''}} {{part.pePart?.institutionSpeciality?.speciality?.name}} {{ part.pePart?.institution ? '-' : ''}} {{part.pePart?.institutionSpeciality?.speciality?.educationalQualification?.name}} {{ part.pePart?.institution ? '-' : ''}} {{part.pePart?.institutionSpeciality?.educationalForm?.name}}"
+                             textTemplate="({institution.shortName} - {subordinate.name}) {institutionSpeciality.speciality.name} - {institutionSpeciality.speciality.educationalQualification.name} - {institutionSpeciality.educationalForm.name}"
+                             (ngModelChange)="fromRegisterSelected($event)"
+                             [required]="true">
+        </nomenclature-select>
+    </div>
+</div>
+
+<div *ngIf="part.peType === previousEducationType.highSchool 
+      && (part.peHighSchoolType === previousHighSchoolEducationType.fromRegister || part.peHighSchoolType === previousHighSchoolEducationType.missingInRegister)"
+     class="row g-3">
+    <div class="col-md-4">
+        <label class="form-label fs-14">{{ 'nomenclature.institution.name' | translate }}</label>
+        <invalid-field [element]="peInstitution"
+                       text="invalidFields.required"></invalid-field>
+        <nomenclature-select restUrl="Nomenclature/Institution"
+                             name="peInstitution"
+                             #peInstitution="ngModel"
+                             title="{{part.peInstitution?.name}}"
+                             [(ngModel)]="part.peInstitution"
+                             (ngModelChange)="institutionChangeService.institutionChange(part, $event, 'peInstitution', 'peSubordinate', 'peInstitutionSpeciality')"
+                             [filter]="{level: level.first, organizationTypes: [organizationType.university, organizationType.specializedUniversity]}"
+                             [disabled]="!isEditMode || part.peHighSchoolType === previousHighSchoolEducationType.fromRegister"
+                             [required]="true">
+        </nomenclature-select>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fs-14">{{ 'nomenclature.subordinate.name' | translate }}</label>
+        <nomenclature-select restUrl="Nomenclature/Institution"
+                             name="peSubordinate"
+                             [(ngModel)]="part.peSubordinate"
+                             title="{{part.peSubordinate?.name}}"
+                             (ngModelChange)="institutionChangeService.subordinateChange(part, $event, 'peSubordinate', 'peInstitution', 'peInstitutionSpeciality')"
+                             [filter]="{level: level.second, parentId: part.peInstitutionId}"
+                             [disabled]="!isEditMode || part.peHighSchoolType === previousHighSchoolEducationType.fromRegister || !part.peInstitutionId">
+        </nomenclature-select>
+    </div>
+
+    <div class="col-md-4">
+        <div *ngIf="part.peHighSchoolType === previousHighSchoolEducationType.missingInRegister">
+            <label class="form-check-label fs-14">{{ 'nomenclature.speciality.titleSingular' | translate }} </label>
+        </div>
+
+        <label *ngIf="part.peHighSchoolType === previousHighSchoolEducationType.fromRegister"
+               class="form-label fs-14">{{ 'nomenclature.speciality.titleSingular' | translate }}</label>
+        <nomenclature-select *ngIf="part.peHighSchoolType === previousHighSchoolEducationType.fromRegister || (part.peHighSchoolType === previousHighSchoolEducationType.missingInRegister && !part.peSpecialityMissingInRegister)"
+                             restUrl="Nomenclature/InstitutionSpeciality"
+                             [(ngModel)]="part.peInstitutionSpeciality"
+                             title="{{ part.peInstitutionSpeciality?.speciality?.code}} {{part.peInstitutionSpeciality?.speciality?.name}} {{ part.peInstitutionSpeciality ? '-' : ''}} {{part.peInstitutionSpeciality?.speciality?.educationalQualification?.name}} {{ part.peInstitutionSpeciality ? '-' : ''}} {{part.peInstitutionSpeciality?.educationalForm?.name}} {{ part.peInstitutionSpeciality ? '-' : ''}} {{part.peInstitutionSpeciality?.duration}} {{ part.peInstitutionSpeciality ? 'год.' : ''}}"
+                             (ngModelChange)="peInstitutionSpecialitySpecialityChanged($event)"
+                             [filter]="{institutionRootId: part.peInstitutionId, institutionId: part.peSubordinateId, onlyMasters: isDoctoral}"
+                             textTemplate="{speciality.code} {speciality.name} - {speciality.educationalQualification.name} - {educationalForm.name} - {duration} год."
+                             [disabled]="!isEditMode || part.peHighSchoolType === previousHighSchoolEducationType.fromRegister || (!part.peSubordinateId && !part.peInstitutionId)"
+                             name="peInstitutionSpeciality"
+                             [required]="true">
+        </nomenclature-select>
+
+        <input *ngIf="part.peHighSchoolType === previousHighSchoolEducationType.missingInRegister && part.peSpecialityMissingInRegister"
+               type="text"
+               class="form-control form-control-sm form-control-invalid"
+               [(ngModel)]="part.peSpecialityName"
+               #peSpeciality="ngModel"
+               maxlength="100"
+               minlength="2"
+               name="peSpeciality"
+               [disabled]="!isEditMode"
+               noWhiteSpacesValidation />
+    </div>
+</div>
+
+<div *ngIf="part.peType === previousEducationType.highSchool 
+      && (part.peHighSchoolType === previousHighSchoolEducationType.abroad || part.peHighSchoolType === previousHighSchoolEducationType.closedInstitution)"
+     class="row g-3">
+    <div *ngIf="part.peHighSchoolType === previousHighSchoolEducationType.abroad"
+         class="col-md-2">
+        <label class="form-label fs-14">{{ 'rdpzsd.personPreviousEducation.peCountry' | translate }}</label>
+        <invalid-field [element]="peCountry"
+                       text="invalidFields.required"></invalid-field>
+        <nomenclature-select restUrl="Nomenclature/Country"
+                             [(ngModel)]="part.peCountry"
+                             (keyPropertyChange)="part.peCountryId = $event"
+                             [filter]="{excludeCode: 'BG'}"
+                             #peCountry="ngModel"
+                             name="peCountry"
+                             [disabled]="!isEditMode"
+                             [required]="true">
+        </nomenclature-select>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fs-14">{{ 'nomenclature.institution.name' | translate }}</label>
+        <invalid-field [element]="peInstitutionName"
+                       text="invalidFields.required"></invalid-field>
+        <input type="text"
+               class="form-control form-control-sm form-control-invalid"
+               [(ngModel)]="part.peInstitutionName"
+               #peInstitutionName="ngModel"
+               name="peInstitutionName"
+               maxlength="100"
+               minlength="2"
+               [disabled]="!isEditMode"
+               noWhiteSpacesValidation />
+    </div>
+
+    <div class="col-md-4"
+         *ngIf="part.peHighSchoolType === previousHighSchoolEducationType.closedInstitution">
+        <label class="form-label fs-14">{{ 'nomenclature.subordinate.name' | translate }}</label>
+        <input type="text"
+               class="form-control form-control-sm form-control-invalid"
+               [(ngModel)]="part.peSubordinateName"
+               name="peSubordinateName"
+               maxlength="100"
+               minlength="2"
+               [disabled]="!isEditMode" />
+    </div>
+    <div class="col-md-4"
+         *ngIf="part.peHighSchoolType === previousHighSchoolEducationType.closedInstitution">
+        <label class="form-label fs-14">{{ 'nomenclature.speciality.titleSingular' | translate }}</label>
+        <invalid-field [element]="peSpecialityName"
+                       text="invalidFields.required"></invalid-field>
+        <input type="text"
+               class="form-control form-control-sm form-control-invalid"
+               [(ngModel)]="part.peSpecialityName"
+               #peSpecialityName="ngModel"
+               name="peSpecialityName"
+               maxlength="100"
+               minlength="2"
+               [disabled]="!isEditMode"
+               noWhiteSpacesValidation />
+    </div>
+
+    <div class="col-md-3"
+         *ngIf="part.peHighSchoolType === previousHighSchoolEducationType.abroad">
+        <label class="form-label fs-14">{{ 'rdpzsd.personPreviousEducation.acquiredSpeciality' | translate }}</label>
+        <invalid-field [element]="acquiredSpeciality"
+                       text="invalidFields.required"></invalid-field>
+        <input type="text"
+               class="form-control form-control-sm form-control-invalid"
+               [(ngModel)]="part.peAcquiredSpeciality"
+               #acquiredSpeciality="ngModel"
+               name="acquiredSpeciality"
+               maxlength="100"
+               minlength="2"
+               [disabled]="!isEditMode"
+               noWhiteSpacesValidation />
+    </div>
+
+    <div class="col-md-3"
+         *ngIf="part.peHighSchoolType === previousHighSchoolEducationType.abroad">
+        <label class="form-label fs-14">{{ 'rdpzsd.personPreviousEducation.recognizedSpeciality' | translate }}</label>
+        <invalid-field [element]="recognizedSpeciality"
+                       text="invalidFields.required"></invalid-field>
+        <input type="text"
+               class="form-control form-control-sm form-control-invalid"
+               [(ngModel)]="part.peRecognizedSpeciality"
+               #recognizedSpeciality="ngModel"
+               name="recognizedSpeciality"
+               maxlength="100"
+               minlength="2"
+               [disabled]="!isEditMode"
+               noWhiteSpacesValidation />
+    </div>
+</div>
+
+<div *ngIf="part.peType === previousEducationType.highSchool"
+     class="row g-3">
+    <div class="col-md-6">
+        <label class="form-label fs-14">{{ 'nomenclature.researchArea.fullName' | translate }}</label>
+        <invalid-field [element]="peResearchArea"
+                       text="invalidFields.required"></invalid-field>
+        <nomenclature-select restUrl="Nomenclature/ResearchArea"
+                             [(ngModel)]="part.peResearchArea"
+                             (keyPropertyChange)="part.peResearchAreaId = $event"
+                             [filter]="{level: level.second}"
+                             #peResearchArea="ngModel"
+                             name="peResearchArea"
+                             textTemplate="{code} {name}"
+                             [required]="true"
+                             [disabled]="!isEditMode || part.peHighSchoolType === previousHighSchoolEducationType.fromRegister || (part.peHighSchoolType === previousHighSchoolEducationType.missingInRegister && !part.peSpecialityMissingInRegister)">
+        </nomenclature-select>
+    </div>
+
+    <div class="col-md-3"
+         *ngIf="part.peType === previousEducationType.highSchool">
+        <label class="form-label fs-14">{{ 'rdpzsd.personPreviousEducation.peDiplomaNumber' | translate }}</label>
+        <input type="text"
+               class="form-control form-control-sm form-control-invalid"
+               [(ngModel)]="part.peDiplomaNumber"
+               #peDiplomaNumber="ngModel"
+               maxlength="25"
+               name="peDiplomaNumber"
+               [disabled]="!isEditMode || part.peHighSchoolType === previousHighSchoolEducationType.fromRegister"
+               noWhiteSpacesValidation />
+    </div>
+
+    <div class="col-md-3"
+         *ngIf="part.peType === previousEducationType.highSchool">
+        <label class="form-label fs-14">{{ 'rdpzsd.personPreviousEducation.peDiplomaDate' | translate }}</label>
+        <invalid-field [element]="peDiplomaDate"
+                       text="invalidFields.required"></invalid-field>
+        <date-time [(ngModel)]="part.peDiplomaDate"
+                   name="peDiplomaDate"
+                   [formControlClass]="peDiplomaDate.invalid && peDiplomaDate.value === null ? 'form-control form-control-sm form-control-invalid-static' : 'form-control form-control-sm'"
+                   [useEndYear]="true"
+                   [disabled]="!isEditMode || part.peHighSchoolType === previousHighSchoolEducationType.fromRegister"
+                   #peDiplomaDate="ngModel"
+                   [required]="true"></date-time>
+    </div>
+</div>
+<div *ngIf="part.peType === previousEducationType.highSchool && part.peHighSchoolType === previousHighSchoolEducationType.abroad"
+     class="row g-3">
+    <div class="col-md-5">
+        <label class="form-label fs-14">{{ 'rdpzsd.personPreviousEducation.peRecognitionDocument' | translate}}</label>
+        <file-upload #peRecognitionDocument="ngModel"
+                     name="peRecognitionDocument"
+                     [required]="true"
+                     [formControlClass]="peRecognitionDocument.invalid ? 'form-control form-control-sm form-control-invalid-static' : 'form-control form-control-sm'"
+                     [disabled]="!isEditMode || !configuration.enableFullFunctionality"
+                     [(ngModel)]="part.peRecognitionDocument">
+        </file-upload>
+    </div>
+
+    <div class="col-md-4">
+        <label class="form-label fs-14">{{ 'rdpzsd.personPreviousEducation.peRecognitionNumber' | translate}}</label>
+        <invalid-field [element]="peRecognitionNumber"
+                       text="invalidFields.required"></invalid-field>
+        <input type="text"
+               class="form-control form-control-sm form-control-invalid"
+               [(ngModel)]="part.peRecognitionNumber"
+               name="peRecognitionNumber"
+               [disabled]="!isEditMode"
+               [required]="true"
+               maxLength="30"
+               #peRecognitionNumber="ngModel" />
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label fs-14">{{ 'rdpzsd.personPreviousEducation.peRecognitionDate' | translate}}</label>
+        <invalid-field [element]="peRecognitionDate"
+                       text="invalidFields.required"></invalid-field>
+        <date-time [(ngModel)]="part.peRecognitionDate"
+                   name="peRecognitionDate"
+                   [disabled]="!isEditMode"
+                   [required]="true"
+                   [formControlClass]="peRecognitionDate.invalid && peRecognitionDate.value === null? 'form-control form-control-sm form-control-invalid-static' : 'form-control form-control-sm'"
+                   [useEndYear]="true"
+                   #peRecognitionDate="ngModel"></date-time>
+    </div>
+</div>

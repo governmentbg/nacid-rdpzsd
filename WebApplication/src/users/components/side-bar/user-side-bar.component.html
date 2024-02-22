@@ -1,0 +1,91 @@
+<button #toggleUserSideBarButton
+        *ngIf="userDataService.currentAuthorizationState === userAutorizationState.login && userDataService.isRsdUser()"
+        class="btn btn-primary display-none"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapseUserSideBar"
+        aria-expanded="false"
+        aria-controls="collapseUserSideBar">
+</button>
+
+<div *ngIf="userDataService.currentAuthorizationState === userAutorizationState.login && userDataService.isRsdUser()"
+     class="user-side-bar collapse collapse-horizontal shadow"
+     id="collapseUserSideBar">
+  <div class="card card-body no-border user-side-bar-body">
+    <ng-container *ngIf="userDataService.userData.institution else couldntLoadInstitution">
+      <div class="d-flex flex-column institution-section">
+        <div class="d-flex">
+          <img *ngIf="userDataService.userData.institution.logo"
+               class="user-institution-logo mx-auto d-block"
+               src="{{'data:image/png;base64,' + userDataService.userData.institution.logo}}">
+        </div>
+        <div class="d-flex text-center institution-name mt-2">
+          <translate-field [entity]="userDataService.userData.institution"></translate-field>
+        </div>
+        <div class="mt-4">
+          <div class="d-flex justify-content-between">
+            <label class="form-check-label fs-15">
+              {{ 'nomenclature.institution.permission.hasBachelor' | translate }}
+            </label>
+            <label class="form-check-label fs-15">
+              {{ 'nomenclature.institution.permission.hasMaster' | translate }}
+            </label>
+            <label class="form-check-label fs-15">
+              {{ 'nomenclature.institution.permission.hasDoctoral' | translate }}
+            </label>
+          </div>
+          <div class="d-flex justify-content-between">
+            <input class="form-check-input bachelor-checkbox"
+                   type="checkbox"
+                   disabled
+                   [checked]="userDataService.userData.institution.hasBachelor">
+
+            <input class="form-check-input"
+                   type="checkbox"
+                   disabled
+                   [checked]="userDataService.userData.institution.hasMaster">
+
+            <input class="form-check-input doctoral-checkbox"
+                   type="checkbox"
+                   disabled
+                   [checked]="userDataService.userData.institution.hasDoctoral">
+          </div>
+        </div>
+      </div>
+      <div class="d-flex flex-column child-institution-section">
+        <ng-template let-childInstitution
+                     ngFor
+                     let-i="index"
+                     [ngForOf]="userDataService.userData.institution.childInstitutions">
+          <div class="d-flex mt-3">
+            <translate-field [entity]="childInstitution"></translate-field>
+          </div>
+        </ng-template>
+      </div>
+    </ng-container>
+    <ng-template #couldntLoadInstitution>
+      <div class="d-flex text-center institution-name mt-2 no-institution-section">
+        {{ 'user.couldntLoadInstitution' | translate }}
+      </div>
+    </ng-template>
+    <div class="d-flex align-items-center flex-column mt-4 bottom-section">
+      <div class="row">
+        <div class="d-flex">
+          <button class="btn btn-primary border-radius-30"
+                  [routerLink]="['/account/changePassword']"
+                  (click)="toggleUserSideBarButton.nativeElement.click()">
+            {{ 'user.changePassword' | translate}}
+          </button>
+        </div>
+      </div>
+      <div class="row mt-2">
+        <div class="d-flex">
+          <button class="btn btn-light border-radius-30"
+                  (click)="userDataService.logout()">
+            {{ 'user.exit' | translate}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

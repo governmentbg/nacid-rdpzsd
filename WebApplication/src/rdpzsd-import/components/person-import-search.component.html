@@ -1,0 +1,292 @@
+<div class="container">
+    <div class="card no-border shadow mt-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label fs-14">{{ 'nomenclature.institution.name' | translate }}</label>
+                    <nomenclature-select restUrl="Nomenclature/Institution"
+                                         [(ngModel)]="filter.institution"
+                                         (keyPropertyChange)="filter.institutionId = $event"
+                                         [filter]="{level: level.first, getInstitutionsByPermissions: true}"
+                                         textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                         [disabled]="userDataService.isRsdUser()">
+                    </nomenclature-select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label fs-14">{{ 'rdpzsdImport.search.state' | translate }}</label>
+                    <enum-select [(ngModel)]="filter.state"
+                                 enumName="importState"
+                                 [enumType]="importStateSearch"
+                                 [showSearchBox]="false">
+                    </enum-select>
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
+                    <sync-button btnClass="btn btn-primary btn-sm ms-3"
+                                 text="root.buttons.search"
+                                 [click]="getData"
+                                 [clickParams]="[false, false]"
+                                 [clickContext]="this"
+                                 icon="fas fa-search">
+                    </sync-button>
+
+                    <sync-button btnClass="btn btn-outline-primary btn-sm ms-3"
+                                 text="root.buttons.clear"
+                                 [click]="clear"
+                                 [clickContext]="this"
+                                 icon="fas fa-trash">
+                    </sync-button>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <div class="d-flex">
+                    <button *ngIf="searchResult.result.length > 0"
+                        class="btn btn-primary btn-sm"
+                        (click)="getDataCount()">
+                        <i style="min-width: 15px" [ngClass]="[loadingDataCount ? 'fas fa-sync fa-spin' : 'fas fa-info']"></i>
+                    </button>
+
+                    <a *ngIf="!dataCount && searchResult.result?.length > 0" 
+                            [routerLink]=""
+                            class="no-text-decoration cursor-pointer fs-18 ms-2 mt-p2" 
+                            (click)="getDataCount()">
+                        {{ 'root.results.number' | translate }} {{ 'root.results.records' | translate }}
+                    </a>
+    
+                    <div *ngIf="dataCount != null"
+                         class="d-flex align-items-center ms-2">
+                        <label class="fs-18">
+                          <span *ngIf="!loadingData">
+                            {{ 'root.results.total' | translate }} {{dataCount | formatNumber}}
+                            {{ 'root.results.records' | translate }}
+                          </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div *ngIf="userDataService.isRsdUser()"
+                     class="d-flex">
+                    <div class="btn-group">
+                        <sync-button btnClass="btn btn-primary btn-sm"
+                                     text="root.buttons.loadNewFile"
+                                     [click]="openNewPersonImportModal"
+                                     [clickContext]="this">
+                        </sync-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-scrollable">
+        <table class="table table-bordered mt-4">
+            <thead class="table-light">
+                <tr>
+                    <th class="col-1-5">{{ 'rdpzsdImport.search.date' | translate }}</th>
+                    <th class="col-1">{{ 'nomenclature.institution.title' | translate }}</th>
+                    <th class="col-2">{{ 'rdpzsdImport.search.entitiesCount' | translate}}</th>
+                    <th class="col-3">{{ 'rdpzsdImport.search.fromUser' | translate }}</th>
+                    <th class="col-2-5">
+                        <div *ngIf="hasWaitingJobItem; else noWaitingJobItem">
+                            <span *ngIf="reloadingItems"
+                                  class="fas fa-sync fa-spin text-light-blue">
+                            </span>
+                            <span *ngIf="!reloadingItems"
+                                  class="text-light-blue cursor-pointer"
+                                  (click)="reloadItems()">
+                                <span class="fas fa-sync"></span>
+                                <a [routerLink]=""
+                                   class="ms-1 no-text-decoration">{{ 'rdpzsdImport.search.checkState' | translate
+                                    }}</a>
+                            </span>
+                        </div>
+                        <ng-template #noWaitingJobItem>
+                            {{ 'rdpzsdImport.search.state' | translate }}
+                        </ng-template>
+                    </th>
+                    <th class="col-2">
+                        {{ 'root.results.actions' | translate }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngIf="!loadingData; else loadingSection">
+                    <ng-container *ngIf="searchResult.result && searchResult.result.length > 0; else noResults">
+                        <tr *ngFor="let personImport of searchResult.result; let i = index">
+                            <td>
+                                {{ personImport.createDate | date: 'dd.MM.yyyy, hh:mm'}}
+                            </td>
+                            <td>
+                                <div>{{ personImport.institution?.shortName }}</div>
+                                <div *ngIf="personImport.subordinate">{{ personImport.subordinate?.shortName }}</div>
+                            </td>
+                            <td>
+                                <div
+                                     *ngIf="personImport.state !== importState.draft && personImport.state !== importState.inProgress">
+                                    <div
+                                         *ngIf="personImport.firstCriteriaCount < 1 && personImport.secondCriteriaCount < 1">
+                                        {{personImport.entitiesAcceptedCount}} от {{personImport.entitiesCount}}</div>
+
+                                    <div *ngIf="personImport.firstCriteriaCount > 0">
+                                        {{personImport.firstCriteriaAcceptedCount}} от
+                                        {{personImport.firstCriteriaCount}} лица с ЕГН/ЛНЧ
+                                    </div>
+
+                                    <div *ngIf="personImport.secondCriteriaCount > 0">
+                                        {{personImport.secondCriteriaAcceptedCount}} от
+                                        {{personImport.secondCriteriaCount}} лица с ИДН
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    {{personImport.userFullname}}
+                                </div>
+                                <div *ngIf="personImport.userEmail">
+                                    <a href="mailto:{{personImport.userEmail}}"
+                                       class="no-text-decoration">
+                                        {{personImport.userEmail}}
+                                    </a>
+                                </div>
+                            </td>
+                            <td>
+                                <div *ngIf="personImport.state !== importState.error"
+                                     [ngClass]="{'text-red': personImport.state === importState.deleted || personImport.state === importState.validationServerError || personImport.state === importState.registrationServerError}">
+                                    {{ 'enums.importState.' + importState[personImport.state] | translate }}
+                                </div>
+
+                                <div *ngIf="personImport.state === importState.error && personImport.errorFile?.name"
+                                     class="d-flex align-items-center text-red">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <a *ngIf="downloadingErrorFileId !== personImport.id"
+                                       class="cursor-pointer text-red no-text-decoration"
+                                       (click)="downloadImportErrorFile(personImport.id, personImport.errorFile.name, personImport.createDate)"
+                                       [routerLink]=""
+                                       title="{{ 'root.buttons.downloadXlsxErrorFile' | translate }}">
+                                        {{ 'enums.importState.' + importState[personImport.state] | translate }}
+                                    </a>
+
+                                    <div *ngIf="downloadingErrorFileId === personImport.id"
+                                         class="fas fa-sync fa-spin">
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="center-text-td">
+                                <div *ngIf="userDataService.isEmsUser() 
+                                     || userDataService.userData.institution.id === personImport.institutionId">
+
+                                    <div class="d-flex"
+                                         *ngIf="personImport.state === importState.registered">
+                                        <i class="fas fa-file-excel text-green fs-15 mt-p1"></i>
+                                        <a class="cursor-pointer text-light-blue ms-2 no-text-decoration text-align-left"
+                                           [routerLink]=""
+                                           (click)="downloadImportUans(personImport.id, personImport.createDate)">
+                                            {{ 'root.buttons.downloadUan' | translate }}
+                                        </a>
+                                    </div>
+
+                                    <div class="d-flex mt-1"
+                                         *ngIf="txtChangeFileId !== personImport.id">
+                                        <i class="far fa-file-alt fs-15 mt-p1"></i>
+                                        <a class="cursor-pointer text-light-blue ms-2 no-text-decoration text-align-left"
+                                           [routerLink]=""
+                                           (click)="downloadImportFile(personImport.id, personImport.importFile.name)">
+                                            {{ 'root.buttons.downloadTxtFile' | translate }}
+                                        </a>
+                                    </div>
+
+                                    <div class="d-flex mt-1"
+                                         *ngIf="txtChangeFileId !== personImport.id 
+                                            && userDataService.userData.userId === personImport.userId 
+                                            && personImport.state === importState.validated">
+                                        <a class="cursor-pointer text-light-blue no-text-decoration text-align-left"
+                                           [routerLink]=""
+                                           (click)="setForRegistration(personImport.id, i)">
+                                            {{ 'root.buttons.register' | translate }}
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="userDataService.userData.userId === personImport.userId
+                                        && (personImport.state === importState.error || personImport.state === importState.validated || personImport.state === importState.validationServerError || personImport.state === importState.registrationServerError)"
+                                     class="d-flex mt-1">
+                                    <i [ngClass]="txtChangeFileId === personImport.id 
+                                                ? 'fas fa-sync fa-spin' 
+                                                : 'fas fa-sync fs-14 mt-p2'"></i>
+                                    <a *ngIf="txtChangeFileId !== personImport.id"
+                                       title="{{ 'root.buttons.changeTxtFile' | translate }}"
+                                       class="cursor-pointer ms-2 no-text-decoration text-align-left"
+                                       [routerLink]=""
+                                       (click)="changeTxtFile.click()">
+                                        {{ 'root.buttons.change' | translate }}
+
+                                        <input #changeTxtFile
+                                               type="file"
+                                               onclick="this.value = null"
+                                               (change)="changeImportFile($event, personImport.id, i)"
+                                               style="display: none;"
+                                               accept=".txt">
+                                    </a>
+                                </div>
+
+                                <div *ngIf="userDataService.userData.userId === personImport.userId
+                                        && (personImport.state === importState.error || personImport.state === importState.validated || personImport.state === importState.validationServerError || personImport.state === importState.registrationServerError)"
+                                     class="d-flex mt-1">
+                                    <i *ngIf="txtChangeFileId !== personImport.id"
+                                       class="fas fa-trash fs-15 mt-p1 text-red"></i>
+                                    <a *ngIf="txtChangeFileId !== personImport.id"
+                                       class="cursor-pointer text-red ms-2 no-text-decoration text-align-left"
+                                       [routerLink]=""
+                                       (click)="delete(personImport.id, i)">
+                                        {{ 'root.buttons.delete' | translate }}
+                                    </a>
+                                </div>
+
+                                <div *ngIf="personImport.importHistories && personImport.importHistories.length > 0
+                                        && (userDataService.isEmsUser() || userDataService.userData.institution.id === personImport.institutionId)"
+                                     class="d-flex mt-1">
+                                    <i class="fas fa-history fs-14 mt-p2"></i>
+                                    <a class="cursor-pointer ms-2 no-text-decoration text-align-left"
+                                       [routerLink]="['/personImport', personImport.id]">
+                                        {{ 'root.buttons.txtHistory' | translate }}
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                    <ng-template #noResults>
+                        <tr>
+                            <td colspan="6"
+                                class="col-12">
+                                <i>{{ 'root.results.noResults' | translate }}</i>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </ng-container>
+                <ng-template #loadingSection>
+                    <tr>
+                        <td colspan="6"
+                            class="col-12">
+                            <loading-section></loading-section>
+                        </td>
+                    </tr>
+                </ng-template>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="searchResult.result 
+      && searchResult.result.length > 0 && searchResult.result.length === filter.limit"
+         class="d-flex flex-row-reverse mt-2">
+        <div class="btn-group">
+            <sync-button btnClass="btn btn-primary"
+                         text="root.buttons.loadMore"
+                         [click]="getData"
+                         [clickContext]="this"
+                         [clickParams]="[true, false]">
+            </sync-button>
+        </div>
+    </div>
+</div>

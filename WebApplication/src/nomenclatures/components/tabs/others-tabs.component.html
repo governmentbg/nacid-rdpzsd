@@ -1,0 +1,42 @@
+<div class="container">
+  <nav ngbNav
+       #nav="ngbNav"
+       [(activeId)]="activeTab"
+       class="nav-tabs">
+    <ng-container ngbNavItem="School">
+      <a ngbNavLink>{{ 'nomenclature.school.title' | translate }}</a>
+      <ng-template ngbNavContent>
+        <school-search></school-search>
+      </ng-template>
+    </ng-container>
+    <ng-container *ngIf="userDataService.isEmsEditUser()"
+                  ngbNavItem="Period">
+      <a ngbNavLink>{{ 'nomenclature.period.title' | translate }}</a>
+      <ng-template ngbNavContent>
+        <period-search></period-search>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="AdmissionReason">
+      <a ngbNavLink>{{ 'nomenclature.admissionReason.title' | translate }}</a>
+      <ng-template ngbNavContent>
+        <admission-reason-search></admission-reason-search>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="EducationFeeType">
+      <a ngbNavLink>{{ 'nomenclature.educationFeeType.title' | translate }}</a>
+      <ng-template ngbNavContent>
+        <education-fee-type-search></education-fee-type-search>
+      </ng-template>
+    </ng-container>
+    <ng-container *ngIf="userDataService.isRsdUser()"
+                  ngbNavItem="UAN">
+      <a ngbNavLink>{{ 'rdpzsd.personLot.uanShort' | translate }}</a>
+      <ng-template ngbNavContent>
+        <person-uan-search></person-uan-search>
+      </ng-template>
+    </ng-container>
+  </nav>
+
+  <div [ngbNavOutlet]="nav"
+       class="mt-2"></div>
+</div>

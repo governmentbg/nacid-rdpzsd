@@ -1,0 +1,127 @@
+<div class="container">
+    <div class="d-flex mt-2">
+        <button class="btn btn-primary btn-sm"
+                (click)="goBack()">
+            <i class="fas fa-angle-left"></i>
+            <span class="ms-1">{{ 'root.buttons.back' | translate }}</span>
+        </button>
+    </div>
+    <ng-container *ngIf="!loadingData && rdpzsdImport">
+        <div class="card mt-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong>
+                        <span>{{ 'rdpzsdImport.currentState' | translate }}</span>
+                        <span [class.text-red]="rdpzsdImport.state === importState.deleted"
+                              [class.text-green]="rdpzsdImport.state === importState.registered">
+                            {{ 'enums.importState.' + importState[rdpzsdImport.state] | translate}}
+                        </span>
+                    </strong>
+                    <strong>
+                        {{ 'rdpzsdImport.search.entitiesCount' | translate}}:
+                        {{rdpzsdImport.entitiesAcceptedCount}} от
+                        {{rdpzsdImport.entitiesCount}}
+                    </strong>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 fs-14">
+                    <div class="col-md-12">
+                        <div class="d-flex">
+                            <label class="form-label fw-bold">
+                                {{ 'rdpzsdImport.search.fromUser' | translate }}:
+                            </label>
+                            <div class="ms-1">{{ rdpzsdImport.userFullname }},</div>
+                            <div *ngIf="rdpzsdImport.userEmail"
+                                 class="ms-1">
+                                <a href="mailto:{{rdpzsdImport.userEmail}}">
+                                    {{rdpzsdImport.userEmail}}
+                                </a>
+                            </div>
+                            <div class="ms-1">
+                                - {{ rdpzsdImport.institution.name }}
+                            </div>
+                            <div *ngIf="rdpzsdImport.subordinate?.id"
+                                 class="ms-1">
+                                ({{ rdpzsdImport.subordinate.shortName }})
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-bordered mt-4">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="col-2">{{ 'rdpzsdImport.search.date' | translate }}</th>
+                            <th class="col-5">{{ 'rdpzsdImport.file' | translate }}</th>
+                            <th class="col-5">{{ 'rdpzsdImport.search.state' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                {{ rdpzsdImport.createDate | date: 'dd.MM.yyyy, hh:mm'}}
+                            </td>
+                            <td>
+                                <a *ngIf="rdpzsdImport?.importFile?.key"
+                                   [routerLink]=""
+                                   class="cursor-pointer"
+                                   (click)="downloadFile(rdpzsdImport?.importFile?.key, rdpzsdImport?.importFile?.name, rdpzsdImport?.importFile?.dbId, rdpzsdImport?.importFile?.mimeType, false, null)">
+                                    {{ rdpzsdImport?.importFile?.name }}
+                                </a>
+                            </td>
+                            <td>
+                                <div *ngIf="rdpzsdImport?.errorFile?.key && rdpzsdImport.state === importState.error"
+                                     class="d-flex align-items-center text-red">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <a [routerLink]=""
+                                       class="cursor-pointer text-red"
+                                       (click)="downloadFile(rdpzsdImport?.errorFile?.key, rdpzsdImport?.errorFile?.name, rdpzsdImport?.errorFile?.dbId, rdpzsdImport?.errorFile?.mimeType, true, rdpzsdImport?.createDate)">
+                                        {{ rdpzsdImport?.errorFile?.name }}
+                                    </a>
+                                </div>
+
+                                <div *ngIf="rdpzsdImport.state !== importState.error">
+                                    {{ 'enums.importState.' + importState[rdpzsdImport.state] | translate }}
+                                </div>
+                            </td>
+                        </tr>
+                        <ng-template ngFor
+                                     let-importHistory
+                                     [ngForOf]="rdpzsdImport.importHistories"
+                                     let-i="index">
+                            <tr>
+                                <td>
+                                    {{ importHistory.createDate | date: 'dd.MM.yyyy, hh:mm'}}
+                                </td>
+                                <td>
+                                    <a *ngIf="importHistory?.importFile?.key"
+                                       [routerLink]=""
+                                       class="cursor-pointer"
+                                       (click)="downloadFile(importHistory?.importFile?.key, importHistory?.importFile?.name, importHistory?.importFile?.dbId, importHistory?.importFile?.mimeType, false, null)">
+                                        {{ importHistory?.importFile?.name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <div *ngIf="importHistory?.errorFile?.key && importHistory.state === importState.error"
+                                         class="d-flex align-items-center text-red">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <a [routerLink]=""
+                                           class="cursor-pointer text-red"
+                                           (click)="downloadFile(importHistory?.errorFile?.key, importHistory?.errorFile?.name, importHistory?.errorFile?.dbId, importHistory?.errorFile?.mimeType, true, importHistory?.createDate)">
+                                            {{ importHistory?.errorFile?.name }}
+                                        </a>
+                                    </div>
+
+                                    <div *ngIf="importHistory.state !== importState.error">
+                                        {{ 'enums.importState.' + importState[importHistory.state] | translate }}
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </ng-container>
+</div>

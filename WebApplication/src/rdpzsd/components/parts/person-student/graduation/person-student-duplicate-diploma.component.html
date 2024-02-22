@@ -1,0 +1,220 @@
+<div class="d-flex justify-content-between">
+    <strong class="form-label fs-14 text-blue mt-2">{{ 'rdpzsd.personStudent.duplicateDiplomas.title' | translate
+        }}</strong>
+    <sync-button *ngIf="!currentPersonContextService.isInEdit
+                        && configuration.enableFullFunctionality
+                        && personLotState === lotState.actual
+                        && partState === partStateType.actual
+                        && studentEventAlias === studentEventGraduatedWithDiploma
+                        && userDataService.isRsdUser() 
+                        && institutionId === userDataService.userData.institution.id 
+                        && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)
+                        && (duplicateDiplomas?.length === 0 || allDuplicatesAreInvalid())"
+                 btnClass="btn btn-primary btn-sm mb-2"
+                 text="root.buttons.addDuplicateDiploma"
+                 [click]="sendForStickerDuplicate"
+                 [clickContext]="this">
+    </sync-button>
+</div>
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr>
+            <th class="col-2">{{ 'rdpzsd.personStudent.stickers.year' | translate }}</th>
+            <th class="col-2">{{ 'rdpzsd.personStudent.duplicateDiplomas.number' | translate }}</th>
+            <th class="col-2">{{ 'rdpzsd.personStudent.duplicateDiplomas.regNumber' | translate }}</th>
+            <th class="col-2">{{ 'rdpzsd.personStudent.duplicateDiplomas.date' | translate }}</th>
+            <th class="col-2">{{ 'rdpzsd.personStudent.duplicateDiplomas.file' | translate }}</th>
+            <th class="col-2">{{ 'root.results.actions' | translate }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-container *ngIf="duplicateDiplomas && duplicateDiplomas.length > 0; else noDuplicateDiplomas">
+            <ng-template ngFor
+                         let-duplicateDiploma
+                         [ngForOf]="duplicateDiplomas"
+                         let-i="index">
+                <tr>
+                    <ng-container *ngIf="duplicateDiploma.isEditMode">
+                        <td colspan="6">
+                            <form #form="ngForm"
+                                  autocomplete="off">
+                                <div class="row g-3">
+                                    <div class="col-md-2">
+                                        <input type="text"
+                                               class="form-control form-control-sm form-control-invalid"
+                                               [(ngModel)]="duplicateDiploma.duplicateStickerYear"
+                                               name="duplicateStickerYear{{i}}"
+                                               maxlength="4"
+                                               minlength="4"
+                                               numbersOnly
+                                               [enableEmptyValidation]="false"
+                                               [min]="2009"
+                                               [max]="currentYear"
+                                               [disabled]="true" />
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <input type="text"
+                                               class="form-control form-control-sm form-control-invalid"
+                                               [(ngModel)]="duplicateDiploma.duplicateDiplomaNumber"
+                                               name="duplicateDiplomaNumber{{i}}"
+                                               maxlength="25"
+                                               [required]="true"
+                                               [disabled]="duplicateDiploma.duplicateStickerState !== studentStickerState.recieved" />
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <input type="text"
+                                               class="form-control form-control-sm form-control-invalid"
+                                               [(ngModel)]="duplicateDiploma.duplicateRegistrationDiplomaNumber"
+                                               name="duplicateRegistrationDiplomaNumber{{i}}"
+                                               maxlength="25"
+                                               [required]="true"
+                                               [disabled]="duplicateDiploma.duplicateStickerState !== studentStickerState.recieved" />
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <date-time [(ngModel)]="duplicateDiploma.duplicateDiplomaDate"
+                                                   name="duplicateDiplomaDate{{i}}"
+                                                   [required]="true"
+                                                   [useEndYear]="true"
+                                                   [disabled]="duplicateDiploma.duplicateStickerState !== studentStickerState.recieved">
+                                        </date-time>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <file-upload [(ngModel)]="duplicateDiploma.file"
+                                                     name="file{{i}}"
+                                                     [required]="duplicateDiploma.duplicateStickerState !== studentStickerState.recieved"
+                                                     [disabled]="!configuration.enableFullFunctionality">
+                                        </file-upload>
+                                    </div>
+
+                                    <div class="d-flex justify-content-center col-md-2">
+                                        <sync-button btnClass="btn btn-success btn-sm ms-2"
+                                                     icon="fas fa-save"
+                                                     titleText="{{ 'root.buttons.save' | translate }}"
+                                                     [disabled]="form.invalid"
+                                                     [click]="save"
+                                                     [clickContext]="this"
+                                                     [clickParams]="[i]">
+                                        </sync-button>
+
+                                        <sync-button btnClass="btn btn-danger btn-sm ms-2"
+                                                     icon="fas fa-times"
+                                                     titleText="{{ 'root.buttons.cancel' | translate }}"
+                                                     [click]="cancel"
+                                                     [clickContext]="this"
+                                                     [clickParams]="[i]">
+                                        </sync-button>
+                                    </div>
+                                </div>
+                            </form>
+                        </td>
+                    </ng-container>
+
+                    <ng-container *ngIf="!duplicateDiploma.isEditMode">
+                        <td>{{ duplicateDiploma.duplicateStickerYear }}</td>
+                        <td>{{ duplicateDiploma.duplicateDiplomaNumber }}</td>
+                        <td>{{ duplicateDiploma.duplicateRegistrationDiplomaNumber }}</td>
+                        <td>{{ duplicateDiploma.duplicateDiplomaDate | date: 'dd.MM.yyyy' }}</td>
+                        <td>
+                            <div *ngIf="userDataService.isEmsUser() || (userDataService.isRsdUser() 
+                                && institutionId === userDataService.userData.institution.id); else noPermissions">
+                                <a *ngIf="duplicateDiploma?.file?.key"
+                                   [routerLink]=""
+                                   class="cursor-pointer"
+                                   (click)="downloadFile(i)">
+                                    {{ duplicateDiploma?.file?.name }}
+                                </a>
+                            </div>
+
+                            <ng-template #noPermissions>
+                                <i>{{ 'root.results.noAccess' | translate }}</i>
+                            </ng-template>
+                        </td>
+                        <td class="center-text-td">
+                            <div
+                                 *ngIf="!currentPersonContextService.isInEdit
+                                    && configuration.enableFullFunctionality
+                                    && duplicateDiploma?.id
+                                    && duplicateDiploma?.isValid
+                                    && personLotState === lotState.actual
+                                    && partState === partStateType.actual
+                                    && studentEventAlias === studentEventGraduatedWithDiploma
+                                    && userDataService.isRsdUser() 
+                                    && institutionId === userDataService.userData.institution.id 
+                                    && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)">
+                                <sync-button *ngIf="duplicateDiploma.duplicateStickerState === studentStickerState.recieved"
+                                             btnClass="btn btn-primary btn-sm ms-2"
+                                             titleText="Редакция"
+                                             icon="fas fa-pen"
+                                             [click]="edit"
+                                             [clickContext]="this"
+                                             [clickParams]="[i]">
+                                </sync-button>
+
+                                <sync-button *ngIf="duplicateDiploma.file && duplicateDiploma.duplicateStickerState === studentStickerState.recieved"
+                                             btnClass="btn btn-danger btn-sm ms-2"
+                                             text="rdpzsd.personStudent.diploma.invalid"
+                                             [click]="invalid"
+                                             [clickContext]="this"
+                                             [clickParams]="[i]">
+                                </sync-button>
+                            </div>
+                            <span *ngIf="duplicateDiploma?.id && !duplicateDiploma.isValid"
+                                  class="text-red">
+                                {{ 'rdpzsd.personStudent.diploma.invalid' | translate }}
+                            </span>
+
+                            <span *ngIf="duplicateDiploma.duplicateStickerState !== studentStickerState.none 
+                                    && duplicateDiploma.duplicateStickerState !== studentStickerState.recieved
+                                    && duplicateDiploma.isValid">
+                                {{ 'enums.studentStickerState.' +
+                                studentStickerState[duplicateDiploma.duplicateStickerState] | translate }}
+                            </span>
+
+                            <div *ngIf="userDataService.isEmsStickersUser()
+                                    && configuration.enableFullFunctionality
+                                    && duplicateDiploma?.id
+                                    && duplicateDiploma?.isValid
+                                    && personLotState === lotState.actual
+                                    && partState === partStateType.actual">
+
+                                <div *ngIf="studentEventAlias === studentEventGraduatedWithDiploma
+                                    && (duplicateDiploma.duplicateStickerState === studentStickerState.sendForSticker || duplicateDiploma.duplicateStickerState === studentStickerState.reissueSticker)"
+                                    class="d-flex mt-1 justify-content-center">
+                                    <i class="fas fa-print fs-14 mt-p2"></i>
+                                    <a class="cursor-pointer text-light-blue ms-2 no-text-decoration "
+                                    [routerLink]=""
+                                    (click)="forPrintDuplicateModal(duplicateDiploma.id)">
+                                        {{ 'root.buttons.forPrint' | translate }}
+                                    </a>
+                                </div>
+
+                                <div *ngIf="studentEventAlias === studentEventGraduatedWithDiploma
+                                    && duplicateDiploma.duplicateStickerState === studentStickerState.stickerForPrint"
+                                    class="d-flex mt-1 justify-content-center">
+                                    <i class="fas fa-check fs-14 mt-p2"></i>
+                                    <a class="cursor-pointer text-light-blue ms-2 no-text-decoration"
+                                    [routerLink]=""
+                                    (click)="recievedDuplicateModal(duplicateDiploma.id)">
+                                        {{ 'root.buttons.recieved' | translate }}
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                    </ng-container>
+                </tr>
+            </ng-template>
+        </ng-container>
+        <ng-template #noDuplicateDiplomas>
+            <tr>
+                <td colspan="6"
+                    class="col-12">
+                    <i>{{ 'rdpzsd.personStudent.duplicateDiplomas.noDuplicateDiplomas' | translate }}</i>
+                </td>
+            </tr>
+        </ng-template>
+    </tbody>
+</table>

@@ -1,0 +1,211 @@
+<form #form="ngForm"
+      autocomplete="off">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.country' | translate }}</label>
+            <invalid-field [element]="country"
+                           text="invalidFields.required"></invalid-field>
+            <nomenclature-select restUrl="Nomenclature/Country"
+                                 name="country"
+                                 #country="ngModel"
+                                 [(ngModel)]="personSecondary.country"
+                                 (keyPropertyChange)="countryChange($event)"
+                                 [disabled]="!isEditMode"
+                                 [required]="true">
+            </nomenclature-select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.graduationYear' | translate }}</label>
+            <invalid-field [element]="graduationYear"
+                           text="invalidFields.invalidSecondaryGraduationYear">
+            </invalid-field>
+            <div class="input-group input-group-sm">
+                <input type="text"
+                       class="form-control form-control-sm form-control-invalid"
+                       [(ngModel)]="personSecondary.graduationYear"
+                       name="graduationYear"
+                       maxlength="4"
+                       minlength="4"
+                       numbersOnly
+                       #graduationYear="ngModel"
+                       [disabled]="!isEditMode"
+                       required
+                       [min]="1960"
+                       [max]="currentYear" />
+            </div>
+        </div>
+
+        <div *ngIf="personSecondary.country && personSecondary.country.code === 'BG'"
+             class="col-md-4">
+            <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.school' | translate }}</label>
+            <label *ngIf="isEditMode"
+                   class="form-check-label fs-14 float-end">
+                <input class="form-check-input cursor-pointer me-1"
+                       type="checkbox"
+                       name="missingSchoolFromRegister"
+                       [(ngModel)]="personSecondary.missingSchoolFromRegister"
+                       (ngModelChange)="schoolFromRegisterChanged()">{{
+                'rdpzsd.personSecondary.schoolMissingFromRegister' | translate }}</label>
+            <span *ngIf="!personSecondary.missingSchoolFromRegister">
+                <invalid-field [element]="school"
+                               text="invalidFields.required"></invalid-field>
+                <nomenclature-select restUrl="Nomenclature/School"
+                                     name="school"
+                                     #school="ngModel"
+                                     title="{{personSecondary.school?.name}}"
+                                     [(ngModel)]="personSecondary.school"
+                                     (keyPropertyChange)="personSecondary.schoolId = $event"
+                                     [disabled]="!isEditMode"
+                                     [required]="true">
+                </nomenclature-select>
+            </span>
+
+            <span *ngIf="personSecondary.missingSchoolFromRegister">
+                <invalid-field [element]="missingSchoolName"
+                               text="invalidFields.cyrillicRequired"></invalid-field>
+                <input type="text"
+                       class="form-control form-control-sm form-control-invalid"
+                       [(ngModel)]="personSecondary.missingSchoolName"
+                       name="missingSchoolName"
+                       maxlength="100"
+                       minlength="8"
+                       #missingSchoolName="ngModel"
+                       [disabled]="!isEditMode"
+                       required>
+            </span>
+        </div>
+
+        <div *ngIf="personSecondary.country && personSecondary.country.code !== 'BG'"
+             class="col-md-7">
+            <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.school' | translate }}</label>
+            <invalid-field [element]="foreignSchoolName"
+                           text="invalidFields.required"></invalid-field>
+            <input type="text"
+                   class="form-control form-control-sm form-control-invalid"
+                   [(ngModel)]="personSecondary.foreignSchoolName"
+                   name="foreignSchoolName"
+                   #foreignSchoolName="ngModel"
+                   [disabled]="!isEditMode"
+                   noWhiteSpacesValidation
+                   maxlength="100"
+                   minlength="2" />
+        </div>
+
+        <div *ngIf="personSecondary.country && personSecondary.country.code === 'BG'"
+             class="col-md-3">
+            <label class="form-label fs-14">{{ 'nomenclature.settlement.name' | translate }}</label>
+            <input *ngIf="!personSecondary.missingSchoolFromRegister"
+                   type="text"
+                   class="form-control form-control-sm"
+                   value="{{ personSecondary?.school?.settlement?.name }}"
+                   disabled />
+            <span *ngIf="personSecondary.missingSchoolFromRegister">
+                <invalid-field [element]="missingSchoolSettlement"
+                               text="invalidFields.required"></invalid-field>
+                <nomenclature-select restUrl="Nomenclature/Settlement"
+                                     name="missingSchoolSettlement"
+                                     #missingSchoolSettlement="ngModel"
+                                     [(ngModel)]="personSecondary.missingSchoolSettlement"
+                                     (keyPropertyChange)="personSecondary.missingSchoolSettlementId = $event"
+                                     [disabled]="!isEditMode"
+                                     [required]="true">
+                </nomenclature-select>
+            </span>
+        </div>
+
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-5">
+            <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.profession' | translate }}</label>
+            <invalid-field [element]="profession"
+                           text="invalidFields.cyrillic"></invalid-field>
+            <input type="text"
+                   class="form-control form-control-sm form-control-invalid"
+                   [(ngModel)]="personSecondary.profession"
+                   name="profession"
+                   #profession="ngModel"
+                   maxlength="100"
+                   minlength="2"
+                   [disabled]="!isEditMode"
+                   cyrillicValidation
+                   [enableEmptyValidation]="true" />
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.diplomaNumber' | translate }}</label>
+            <input type="text"
+                   class="form-control form-control-sm form-control-invalid"
+                   [(ngModel)]="personSecondary.diplomaNumber"
+                   name="diplomaNumber"
+                   maxlength="25"
+                   #diplomaNumber="ngModel"
+                   [disabled]="!isEditMode" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.diplomaDate' | translate }}</label>
+            <invalid-field [element]="diplomaDate"
+                           text="invalidFields.required"></invalid-field>
+            <date-time [(ngModel)]="personSecondary.diplomaDate"
+                       name="diplomaDate"
+                       [disabled]="!isEditMode"
+                       [required]="true"
+                       [formControlClass]="diplomaDate.invalid && diplomaDate.value === null ? 'form-control form-control-sm form-control-invalid-static' : 'form-control form-control-sm'"
+                       [useEndYear]="true"
+                       #diplomaDate="ngModel"></date-time>
+        </div>
+    </div>
+
+    <div class="row g-3"
+         *ngIf="personSecondary.country && personSecondary.country.code !== 'BG'">
+
+        <div class="col-md-5">
+            <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.recognitionDocument' | translate}}</label>
+            <file-upload #recognitionDocument="ngModel"
+                         name="recognitionDocument"
+                         [required]="true"
+                         [formControlClass]="recognitionDocument.invalid ? 'form-control form-control-sm form-control-invalid-static' : 'form-control form-control-sm'"
+                         [disabled]="!isEditMode || !configuration.enableFullFunctionality"
+                         [(ngModel)]="personSecondary.personSecondaryRecognitionDocument">
+            </file-upload>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.recognitionNumber' | translate}}</label>
+            <invalid-field [element]="recognitionNumber"
+                           text="invalidFields.required"></invalid-field>
+            <input type="text"
+                   class="form-control form-control-sm form-control-invalid"
+                   [(ngModel)]="personSecondary.recognitionNumber"
+                   name="recognitionNumber"
+                   [disabled]="!isEditMode"
+                   [required]="true"
+                   maxLength="30"
+                   #recognitionNumber="ngModel" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.recognitionDate' | translate}}</label>
+            <invalid-field [element]="recognitionDate"
+                           text="invalidFields.required"></invalid-field>
+            <date-time [(ngModel)]="personSecondary.recognitionDate"
+                       name="recognitionDate"
+                       [disabled]="!isEditMode"
+                       [required]="true"
+                       [formControlClass]="recognitionDate.invalid && recognitionDate.value === null? 'form-control form-control-sm form-control-invalid-static' : 'form-control form-control-sm'"
+                       [useEndYear]="true"
+                       #recognitionDate="ngModel"></date-time>
+        </div>
+
+    </div>
+
+    <span *ngIf="loadingImages"
+          class="fas fa-sync fa-spin text-light-blue"></span>
+    <a *ngIf="configuration.enableRsoIntegration && !loadingImages && personSecondary.id && personSecondary.fromRso && !isEditMode"
+       href=""
+       (click)="$event.preventDefault();loadDiplomaImage(personSecondary.rsoIntId)">{{ 'root.buttons.loadDiplomaImage' |
+        translate}}
+    </a>
+</form>

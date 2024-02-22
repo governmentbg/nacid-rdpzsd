@@ -1,0 +1,203 @@
+<collapsable-section [isCollapsed]="isCollapsed"
+                     classHeader="heading"
+                     heading="{{ personStudent.partInfo.actionDate | date: 'dd.MM.yyyy, hh:mm'}}, {{personStudent.partInfo?.institution?.shortName ? personStudent.partInfo?.institution?.shortName : ''}}{{personStudent.partInfo?.subordinate?.shortName ? personStudent.partInfo?.subordinate?.shortName : ''}} ({{personStudent.partInfo.userFullname}}) - {{'enums.partState.' + partState[personStudent.state] | translate}}">
+    <div body>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <input type="text"
+                       class="form-control form-control-sm"
+                       value="{{ personStudent.institution?.name }}"
+                       disabled />
+            </div>
+
+            <div class="col-md-6">
+                <input type="text"
+                       class="form-control form-control-sm"
+                       value="{{ personStudent.subordinate?.name }}"
+                       disabled />
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-12">
+                <input type="text"
+                       class="form-control form-control-sm"
+                       value="{{ personStudent.institutionSpeciality?.speciality?.code }} {{ personStudent.institutionSpeciality?.speciality?.name }} - {{ personStudent.institutionSpeciality?.speciality?.educationalQualification?.name }} - {{ personStudent.institutionSpeciality?.educationalForm?.name }} - {{ personStudent.institutionSpeciality?.duration }} год."
+                       disabled />
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-9">
+                <label class="form-label fs-14">{{ 'nomenclature.admissionReason.title' | translate }}</label>
+                <div class="input-group input-group-sm">
+                    <input type="text"
+                           class="form-control form-control-sm"
+                           value="{{translateService.currentLang === 'bg' ? personStudent.admissionReason.name : personStudent.admissionReason.nameAlt }}"
+                           disabled />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'rdpzsd.personStudent.facultyNumber' | translate }}</label>
+                <div class="input-group input-group-sm">
+                    <input type="text"
+                           class="form-control form-control-sm"
+                           value="{{personStudent.facultyNumber}}"
+                           disabled />
+                </div>
+            </div>
+        </div>
+        <ngb-accordion #acc="ngbAccordion">
+            <ngb-panel *ngIf="personStudent.protocols?.length > 0 
+                    || personStudent.stickerYear
+                    || personStudent.diploma"
+                       title="{{ 'rdpzsd.personDiploma.title' | translate }}">
+                <ng-template ngbPanelContent>
+                    <div *ngIf="personStudent.stickerYear"
+                         class="row g-3">
+                        <div class="col-md-10">
+                            <strong>
+                                {{'rdpzsd.personStudent.stickers.year' | translate}}:
+                            </strong>
+                            <span>
+                                {{personStudent.stickerYear}}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3"
+                         *ngFor="let personProtocol of personStudent.protocols">
+                        <div class="col-md-12">
+                            <strong>
+                                {{'rdpzsd.personDiploma.protocolNumber' | translate}}:
+                            </strong>
+                            <span>
+                                {{personProtocol.protocolNumber}}
+                            </span>
+                            <span>
+                                от
+                            </span>
+                            {{personProtocol.protocolDate | date: 'dd.MM.yyyy'}} г.
+                            <span>
+                                ({{ 'enums.studentProtocolType.' + studentProtocolType[personProtocol.protocolType] |
+                                translate}})
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3"
+                         *ngIf="personStudent.diploma">
+                        <div class="col-md-12">
+                            <strong>
+                                {{'rdpzsd.personStudent.diploma.title' | translate}}:
+                            </strong>
+                            <span>
+                                {{personStudent.diploma.diplomaNumber}}/{{personStudent.diploma.registrationDiplomaNumber}}
+                            </span>
+                            <span>
+                                от
+                            </span>
+                            {{personStudent.diploma.diplomaDate | date: 'dd.MM.yyyy'}} г.
+                            <span *ngIf="!personStudent.diploma.isValid">
+                                -
+                                <span class="text-red">
+                                    {{'rdpzsd.personStudent.diploma.invalid' | translate}}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3"
+                         *ngFor="let duplicateDiploma of sortDuplicateDiplomas()">
+                        <div class="col-md-12">
+                            <strong>
+                                {{'rdpzsd.personStudent.duplicateDiplomas.name' | translate}}:
+                            </strong>
+                            <span>
+                                {{duplicateDiploma.duplicateDiplomaNumber}}/{{duplicateDiploma.duplicateRegistrationDiplomaNumber}}
+                            </span>
+                            <span>
+                                от
+                            </span>
+                            {{duplicateDiploma.duplicateDiplomaDate | date: 'dd.MM.yyyy'}} г.
+                            <span>
+                                - {{'rdpzsd.personStudent.stickers.year' | translate}}:
+                                {{duplicateDiploma.duplicateStickerYear}}
+                            </span>
+                            <span *ngIf="!duplicateDiploma.isValid">
+                                -
+                                <span class="text-red">
+                                    {{'rdpzsd.personStudent.diploma.invalid' | translate}}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </ng-template>
+            </ngb-panel>
+            <ngb-panel title="{{ 'rdpzsd.personSemester.specialityTitle' | translate }}">
+                <ng-template ngbPanelContent>
+                    <div class="row g-3"
+                         *ngFor="let semester of sortSemesters()">
+                        <div class="col-md-10">
+                            {{translateService.currentLang === 'bg' ? semester.period.name :
+                            semester.period.nameAlt}} -
+                            <span
+                                  *ngIf="semester?.studentEvent?.alias === studentEventIndividualPlanTwoYears || semester?.studentEvent?.alias === studentEventIndividualPlanTwoSemesters">
+                                {{ 'rdpzsd.personStudent.courseShort' | translate }} {{ 'enums.courseType.' +
+                                courseType[semester.individualPlanCourse] + 'Number' | translate}}/сем. {{
+                                'enums.semester.' +
+                                semesterType[semester.individualPlanSemester] + 'Number' | translate }},
+                            </span>
+                            {{ 'rdpzsd.personStudent.courseShort' | translate }} {{ 'enums.courseType.' +
+                            courseType[semester.course] + 'Number' | translate}}/сем. {{ 'enums.semester.' +
+                            semesterType[semester.studentSemester] + 'Number' | translate }},
+                            <strong>{{translateService.currentLang === 'bg' ? semester.studentStatus.name :
+                                semester.studentStatus.nameAlt}}</strong>
+                            <span> ({{translateService.currentLang === 'bg' ?
+                                semester.studentEvent.name.toLowerCase().trim() :
+                                semester.studentEvent.nameAlt.toLowerCase().trim()}})</span>
+                            <span *ngIf="semester.educationFeeType?.name">, {{ semester.educationFeeType.name }}</span>
+                            <p *ngIf="semester.semesterRelocatedFile">
+                                <a (click)="getRelocationFile(semester)"
+                                   target="_blank"
+                                   style="cursor: pointer; text-decoration: none;"
+                                   class="text-overflow">{{ semester.semesterRelocatedFile.name }}
+                                </a>
+                            </p>
+                            <div *ngIf="semester.hasScholarship || semester.useHostel || semester.useHolidayBase || semester.participatedIntPrograms"
+                                class="d-flex mt-3">
+                                <div *ngIf="semester.hasScholarship"
+                                    ngbTooltip="{{ 'rdpzsd.personSemester.hasScholarship' | translate }}"
+                                    tooltipClass="primary-tooltip"
+                                    class="fas fa-euro-sign fa-lg">
+                                </div>
+
+                                <div *ngIf="semester.useHostel"
+                                    [ngClass]="{'ms-2': semester.hasScholarship}"
+                                    ngbTooltip="{{ 'rdpzsd.personSemester.useHostel' | translate }}"
+                                    tooltipClass="primary-tooltip"
+                                    class="far fa-building fa-lg">
+                                </div>
+
+                                <div *ngIf="semester.useHolidayBase"
+                                    [ngClass]="{'ms-2': semester.hasScholarship || semester.useHostel}"
+                                    ngbTooltip="{{ 'rdpzsd.personSemester.useHolidayBase' | translate }}"
+                                    tooltipClass="primary-tooltip"
+                                    class="fas fa-umbrella-beach fa-lg">
+                                </div>
+
+                                <div *ngIf="semester.participatedIntPrograms"
+                                    [ngClass]="{'ms-2': semester.hasScholarship || semester.useHostel || semester.useHolidayBase}"
+                                    ngbTooltip="{{ 'rdpzsd.personSemester.participatedIntPrograms' | translate }}"
+                                    tooltipClass="primary-tooltip"
+                                    class="fas fa-globe-americas fa-lg">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </ngb-panel>
+        </ngb-accordion>
+    </div>
+</collapsable-section>

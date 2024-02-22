@@ -1,0 +1,37 @@
+<div class="d-flex align-items-center {{inputGroupClass}}">
+	<div *ngIf="model?.name"
+		 class="d-flex justify-content-between align-items-center {{formControlClass}}"
+		 [class.control-disabled]="disabled">
+		<a (click)="getFile()"
+		   target="_blank"
+		   style="cursor: pointer; text-decoration: none;"
+		   class="text-overflow">{{ model?.name }}</a>
+		<i *ngIf="!disabled"
+		   class="fas fa-times cursor-pointer"
+		   (click)="deleteFile()"></i>
+	</div>
+
+	<span *ngIf="!model?.key"
+		  class="{{formControlClass}}"
+		  [class.form-control-invalid-static]="!disabled && required && !model?.key"
+		  [class.control-disabled]="disabled">{{ (!hideNoFileUpload ? 'rdpzsd.personBasic.noFileUpload' : '') | translate }}</span>
+
+	<div *ngIf="!disabled">
+		<div *ngIf="fileUploadProgress"
+			 class="btn {{btnClass}}">
+			<i class="fas fa-sync fa-spin"></i>
+		</div>
+
+		<label *ngIf="!fileUploadProgress"
+			   class="btn {{btnClass}} cursor-pointer"
+			   [class.noevents]="disabled">
+			<i class="fas fa-file-upload"
+			   style="min-width: 15px;"></i>
+			<input type="file"
+				   onclick="this.value = null"
+				   accept="{{fileFormat}}"
+				   (change)="uploadFile($event)"
+				   style="display: none;">
+		</label>
+	</div>
+</div>

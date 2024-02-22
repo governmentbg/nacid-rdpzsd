@@ -1,0 +1,34 @@
+<div class="container">
+  <nav ngbNav
+       #nav="ngbNav"
+       [(activeId)]="activeTab"
+       class="nav-tabs">
+    <ng-container ngbNavItem="Country">
+      <a ngbNavLink>{{ 'nomenclature.country.title' | translate }}</a>
+      <ng-template ngbNavContent>
+        <country-search></country-search>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="District">
+      <a ngbNavLink>{{ 'nomenclature.district.title' | translate }}</a>
+      <ng-template ngbNavContent>
+        <district-search></district-search>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="Municipality">
+      <a ngbNavLink>{{ 'nomenclature.municipality.title' | translate }}</a>
+      <ng-template ngbNavContent>
+        <municipality-search></municipality-search>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="Settlement">
+      <a ngbNavLink>{{ 'nomenclature.settlement.title' | translate }}</a>
+      <ng-template ngbNavContent>
+        <settlement-search></settlement-search>
+      </ng-template>
+    </ng-container>
+  </nav>
+
+  <div [ngbNavOutlet]="nav"
+       class="mt-2"></div>
+</div>

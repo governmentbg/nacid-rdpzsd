@@ -1,0 +1,42 @@
+<div class="d-flex justify-content-between min-height-31">
+    <div>
+        <person-lot-cancel-approval *ngIf="personLotState === lotState.cancelApproval 
+                                    && userDataService.isRsdUser() 
+                                    && userDataService.userData.userId === personLotCreateUserId"
+                                    [personLotId]="personLotId">
+        </person-lot-cancel-approval>
+    </div>
+    <div *ngIf="!currentPersonContextService.isInEdit"
+         class="btn-group">
+        <sync-button *ngIf="userDataService.isEmsEditUser() && personLotState === lotState.pendingApproval"
+                     btnClass="btn btn-outline-primary btn-sm ms-2 me-2"
+                     text="rdpzsd.personLot.lotActions.cancelApproval"
+                     [click]="cancelPendingApproval"
+                     [clickContext]="this">
+        </sync-button>
+
+        <sync-button *ngIf="userDataService.isEmsEditUser() && personLotState === lotState.pendingApproval"
+                     btnClass="btn btn-primary btn-sm ms-2"
+                     text="rdpzsd.personLot.lotActions.approve"
+                     [click]="approve"
+                     [clickContext]="this">
+        </sync-button>
+
+        <sync-button *ngIf="(personLotState === lotState.missingPassportCopy || personLotState === lotState.cancelApproval) && userDataService.isRsdUser() && userDataService.userData.userId === personLotCreateUserId"
+                     btnClass="btn btn-primary btn-sm ms-2"
+                     text="rdpzsd.personLot.lotActions.sendForApproval"
+                     [click]="sendForApproval"
+                     [clickContext]="this">
+        </sync-button>
+
+        <!-- <sync-button *ngIf="(personLotState === lotState.cancelApproval || personLotState === lotState.actual)
+                    && (personLotState === lotState.cancelApproval 
+                        ? (userDataService.isRsdUser() && userDataService.userData.userId === personLotCreateUserId)
+                        : userDataService.isEmsEditUser())"
+                     btnClass="btn btn-danger btn-sm ms-2"
+                     text="rdpzsd.personLot.lotActions.deleteLot"
+                     [click]="deleteLot"
+                     [clickContext]="this">
+        </sync-button> -->
+    </div>
+</div>

@@ -1,0 +1,13 @@
+<img *ngIf="translate.currentLang === 'en'"
+     src="../../../assets/img/bg-flag.png"
+     (click)="changeLanguage('bg')"
+     width="35"
+     height="35"
+     class="d-inline-block align-text-top cursor-pointer">
+
+<img *ngIf="translate.currentLang === 'bg'"
+     src="../../../assets/img/uk-flag.png"
+     (click)="changeLanguage('en')"
+     width="35"
+     height="35"
+     class="d-inline-block align-text-top cursor-pointer">

@@ -1,0 +1,51 @@
+<div class="d-flex justify-content-end">
+    <div *ngIf="model.state === partState.erased && !isEditMode"
+         class="d-flex align-items-center text-red">
+        {{ 'enums.partState.' + partState[model.state] | translate }}
+    </div>
+    <div class="btn-group">
+        <sync-button *ngIf="!isEditMode && !fromModal && partHistoryDto.histories && partHistoryDto.histories.length > 0
+            && !currentPersonContextService?.isInEdit"
+                     btnClass="btn btn-outline-primary btn-sm ms-2"
+                     text="rdpzsd.personLot.partActions.history"
+                     [click]="showHistory"
+                     [clickContext]="this">
+        </sync-button>
+
+        <sync-button *ngIf="!isEditMode && model.state === partState.actual 
+                        && !hideEditActions
+                        && !currentPersonContextService?.isInEdit
+                        && enableErase
+                        && model?.id > 0"
+                     btnClass="btn btn-outline-primary-danger btn-sm ms-2"
+                     text="rdpzsd.personLot.partActions.erase"
+                     [click]="erase"
+                     [clickContext]="this">
+        </sync-button>
+
+        <sync-button *ngIf="!isEditMode && model.state === partState.actual && !hideEditActions
+                        && !currentPersonContextService?.isInEdit"
+                     btnClass="btn btn-primary btn-sm ms-2"
+                     text="rdpzsd.personLot.partActions.edit"
+                     [click]="edit"
+                     [clickContext]="this">
+        </sync-button>
+
+        <sync-button *ngIf="isEditMode && model.state === partState.actual && !hideEditActions"
+                     btnClass="btn btn-success btn-sm ms-2"
+                     icon="fas fa-save"
+                     titleText="{{ 'root.buttons.save' | translate }}"
+                     [disabled]="invalidForm"
+                     [click]="save"
+                     [clickContext]="this">
+        </sync-button>
+
+        <sync-button *ngIf="isEditMode && model.state === partState.actual && !hideEditActions"
+                     btnClass="btn btn-danger btn-sm ms-2"
+                     icon="fas fa-times"
+                     titleText="{{ 'root.buttons.cancel' | translate }}"
+                     [click]="cancel"
+                     [clickContext]="this">
+        </sync-button>
+    </div>
+</div>

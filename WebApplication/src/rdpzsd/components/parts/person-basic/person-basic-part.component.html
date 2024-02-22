@@ -1,0 +1,47 @@
+<div class="card mt-4">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <strong class="ft-upper">{{ 'rdpzsd.personBasic.title' | translate }}</strong>
+
+            <div *ngIf="personLotId && entity && !loadingData"
+                 class="d-flex align-items-center">
+                <sync-button *ngIf="configuration.enableFullFunctionality 
+                                && !isEditMode 
+                                && entity?.id 
+                                && personLotId
+                                && !currentPersonContextService.hasActualStudentOrDoctoral
+                                && personLotState === lotState.actual
+                                && (userDataService.isRsdUser() || userDataService.isEmsEditUser())"
+                             btnClass="btn btn-outline-primary-danger btn-sm ms-2"
+                             [click]="eraseLot"
+                             [clickParams]="[null]"
+                             [clickContext]="this"
+                             text="root.buttons.erase">
+                </sync-button>
+
+                <part-actions *ngIf="(userDataService.isEmsEditUser() || userDataService.isRsdUser())
+                            && (personLotState === lotState.actual || personLotState === lotState.erased || ((personLotState === lotState.cancelApproval || personLotState === lotState.missingPassportCopy) && userDataService.isRsdUser() && userDataService.userData.userId === personLotCreateUserId))"
+                              [model]="entity"
+                              (modelChange)="modelChange($event)"
+                              [(isEditMode)]="isEditMode"
+                              [invalidForm]="!isValidPersonBasicForm"
+                              [hideEditActions]="!configuration.enableFullFunctionality 
+                                || (currentPersonContextService.openedFromStickers 
+                                    && currentPersonContextService.personStudentStickerDto?.stickerState !== stickerState.none
+                                    && currentPersonContextService.personStudentStickerDto?.stickerState !== stickerState.returnedForEdit)"
+                              (showHistoryEvent)="showHistory($event)"
+                              restUrl="PersonBasic">
+                </part-actions>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <person-basic *ngIf="entity"
+                      [personLotId]="personLotId"
+                      [personLotState]="personLotState"
+                      [personBasic]="entity"
+                      [isEditMode]="isEditMode"
+                      [(isValidForm)]="isValidPersonBasicForm">
+        </person-basic>
+    </div>
+</div>

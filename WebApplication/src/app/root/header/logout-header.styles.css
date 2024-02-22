@@ -1,0 +1,23 @@
+.navbar {
+  height: 4.45rem;
+}
+
+.navbar-light {
+  color: #fff;
+  background-color: #135496;
+}
+
+.nacid-text {
+  margin-bottom: 0;
+}
+
+language-button {
+  position: absolute;
+  right: 25px;
+}
+
+@media screen and (max-width: 990px) {
+  .navbar-brand {
+    margin-top: -10px;
+  }
+}

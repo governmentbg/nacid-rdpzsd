@@ -1,0 +1,41 @@
+<div class="modal-header modal-header-background ft-upper ">
+    <strong *ngIf="!readOnly">
+        {{ 'root.note.title' | translate }}
+    </strong>
+    <strong *ngIf="readOnly">
+        {{ noteDto?.date | date: 'dd.MM.yyyy' }} - {{ 'root.note.text' | translate }} от {{ noteDto?.userFullname }}
+    </strong>
+</div>
+<form #form="ngForm">
+    <div class="modal-body p-3">
+        <div class="d-flex input-group input-group-sm">
+            <textarea class="form-control form-control-sm"
+                      [(ngModel)]="noteDto.note"
+                      name="note"
+                      rows="4"
+                      maxlength="500"
+                      minlength="2"
+                      [disabled]="readOnly"
+                      required>
+            </textarea>
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+            <button *ngIf="!readOnly"
+                    class="btn btn-sm btn-primary"
+                    [disabled]="form.invalid"
+                    (click)="send()">{{ 'root.buttons.return' | translate }}
+            </button>
+            <button *ngIf="!readOnly"
+                    ngbAutofocus
+                    class="btn btn-sm btn-outline-primary ms-2"
+                    (click)="cancel()">{{ 'root.buttons.cancel' | translate }}
+            </button>
+
+            <button *ngIf="readOnly"
+                    ngbAutofocus
+                    class="btn btn-sm btn-outline-primary ms-2"
+                    (click)="cancel()">{{ 'root.buttons.close' | translate }}
+            </button>
+        </div>
+    </div>
+</form>

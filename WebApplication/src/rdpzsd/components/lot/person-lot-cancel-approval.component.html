@@ -1,0 +1,9 @@
+<div class="ps-1"
+     *ngIf="personLotAction">
+    <p class="fw-bold text-red hide-text">
+        <span class="text-red fw-400 cursor-pointer underline"
+              (click)="showLotNote()">
+            {{ personLotAction?.note }}
+        </span>
+    </p>
+</div>

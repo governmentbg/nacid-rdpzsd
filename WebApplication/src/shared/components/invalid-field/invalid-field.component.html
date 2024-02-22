@@ -1,0 +1,5 @@
+<i *ngIf="element && (!requiredTouched || element.touched) && element.invalid"
+   class="fas fa-exclamation-circle text-blue ms-1"
+   placement="top"
+   ngbTooltip="{{ text | translate }}"
+   tooltipClass="primary-tooltip"></i>

@@ -1,0 +1,122 @@
+<form #form="ngForm"
+      autocomplete="off">
+    <div class="row g-3">
+        <div class="col-md-3"
+             *ngIf="!personStudent.id && isEditMode">
+            <label class="form-label fs-14">{{ 'nomenclature.educationalQualification.OKS' | translate }}</label>
+            <nomenclature-select restUrl="Nomenclature/EducationalQualification"
+                                 name="educationalQualificationFilter"
+                                 [showSearchBox]="false"
+                                 [(ngModel)]="educationalQualificationFilter"
+                                 (ngModelChange)="educationalQualificationFilterChange($event)"
+                                 [filter]="{alias: doctor, excludeAlias: true}"
+                                 textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                 [required]="true">
+            </nomenclature-select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label fs-14">{{ 'nomenclature.subordinate.name' | translate }}</label>
+            <nomenclature-select restUrl="Nomenclature/Institution"
+                                 [(ngModel)]="personStudent.subordinate"
+                                 (ngModelChange)="institutionChangeService.subordinateChange(personStudent, $event, 'subordinate', 'institution', 'institutionSpeciality')"
+                                 [filter]="{level: level.second, parentId: userDataService.isEmsUser() ? personStudent.institutionId : userDataService.userData.institution.id, getInstitutionsByPermissions: true}"
+                                 title="{{translateService.currentLang === 'bg' ? personStudent.subordinate?.name : personStudent.subordinate?.nameAlt }}"
+                                 textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                 [disabled]="!isEditMode || personStudent.id > 0"
+                                 name="subordinate">
+            </nomenclature-select>
+        </div>
+
+        <div [ngClass]="{'col-md-5': !personStudent.id && isEditMode, 'col-md-8': personStudent.id}">
+            <label class="form-label fs-14">{{ 'nomenclature.admissionReason.titleSingular' | translate }}</label>
+            <invalid-field [element]="admissionReason"
+                           text="invalidFields.required"></invalid-field>
+            <nomenclature-select restUrl="Nomenclature/AdmissionReason"
+                                 [(ngModel)]="personStudent.admissionReason"
+                                 (keyPropertyChange)="personStudent.admissionReasonId = $event"
+                                 title="{{ translateService.currentLang === 'bg' ? personStudent.admissionReason?.name : personStudent.admissionReason?.nameAlt }}"
+                                 textTemplate="{{translateService.currentLang === 'bg' ? '{id} - {name}' : '{id} - {nameAlt}'}}"
+                                 [filter]="{ euCountry: currentPersonContext.citizenship?.euCountry || (currentPersonContext.secondCitizenship ? currentPersonContext.secondCitizenship?.euCountry : false), eeaCountry: currentPersonContext.citizenship?.eeaCountry || (currentPersonContext.secondCitizenship ? currentPersonContext.secondCitizenship?.eeaCountry : false), citizenshipId: currentPersonContext.citizenship?.id, secondCitizenshipId: currentPersonContext.secondCitizenship?.id, studentType: studentType.students }"
+                                 [disabled]="!isEditMode || personStudent?.semesters?.length > 1"
+                                 #admissionReason="ngModel"
+                                 name="admissionReason"
+                                 [required]="true">
+            </nomenclature-select>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-10">
+            <label class="form-label fs-14">{{ 'nomenclature.speciality.titleSingular' | translate }}</label>
+            <invalid-field [element]="institutionSpeciality"
+                           text="invalidFields.required"></invalid-field>
+            <nomenclature-select restUrl="Nomenclature/InstitutionSpeciality"
+                                 [(ngModel)]="personStudent.institutionSpeciality"
+                                 (keyPropertyChange)="personStudent.institutionSpecialityId = $event"
+                                 (ngModelChange)="institutionSpecialityChanged()"
+                                 [filter]="{institutionId: personStudent.subordinateId || personStudent.institutionId, educationalQualificationId: educationalQualificationFilter?.id, getInstitutionSpecialitiesByPermissions: true}"
+                                 textTemplate="{speciality.code} {speciality.name} - {speciality.educationalQualification.name} - {educationalForm.name} - {duration} год."
+                                 [disabled]="!isEditMode || !personStudent.institutionId || personStudent.id > 0 || (!personStudent.id && !educationalQualificationFilter)"
+                                 #institutionSpeciality="ngModel"
+                                 name="institutionSpeciality"
+                                 [required]="true">
+            </nomenclature-select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label fs-14">{{ 'rdpzsd.personStudent.facultyNumber' | translate }}</label>
+            <input type="text"
+                   class="form-control form-control-sm form-control-invalid"
+                   [(ngModel)]="personStudent.facultyNumber"
+                   name="facultyNumber"
+                   maxlength="50"
+                   #facultyNumber="ngModel"
+                   [disabled]="!isEditMode" />
+        </div>
+    </div>
+    <div class="row g-3"
+         *ngIf="personStudent.institutionSpeciality && personStudent.institutionSpeciality.isJointSpeciality && personStudent.institutionSpeciality.institutionSpecialityJointSpecialities.length > 0">
+        <label class="fs-18">{{'rdpzsd.personStudent.jointSpecialitySection' | translate}}</label>
+        <label class="fs-16"
+               *ngIf="institutionSpecialityJointSpecialitiesByLocation(personStudent.institutionSpeciality.institutionSpecialityJointSpecialities, 1).length > 0">{{'enums.institutionSpecialityJointSpecialityLocation.inBulgaria'
+            | translate}}</label>
+        <div
+             *ngFor="let jointSpeciality of institutionSpecialityJointSpecialitiesByLocation(personStudent.institutionSpeciality.institutionSpecialityJointSpecialities, 1)">
+            <p class="fs-12">
+                {{jointSpeciality.institution.name}} {{jointSpeciality.institutionByParent? ' - ' +
+                jointSpeciality.institutionByParent.name : ''}}
+            </p>
+        </div>
+        <label class="fs-16"
+               *ngIf="institutionSpecialityJointSpecialitiesByLocation(personStudent.institutionSpeciality.institutionSpecialityJointSpecialities, 2).length > 0">{{'enums.institutionSpecialityJointSpecialityLocation.abroad'
+            | translate}}</label>
+        <div
+             *ngFor="let jointSpeciality of institutionSpecialityJointSpecialitiesByLocation(personStudent.institutionSpeciality.institutionSpecialityJointSpecialities, 2)">
+            <p class="fs-12">
+                {{jointSpeciality.foreignInstitutionName}} {{jointSpeciality.foreignInstitutionByParentName? ' - ' +
+                jointSpeciality.foreignInstitutionByParentName : ''}}
+            </p>
+        </div>
+    </div>
+    <div class="row g-3 mt-2">
+        <collapsable-label heading="rdpzsd.personPreviousEducation.title"
+                           fontSize="fs-16"
+                           secondIcon="{{ isSecondaryFromRso || isHighSchoolNotFromRegister ? 'fas fa-exclamation-triangle ms-1 text-orange fs-16' : null }}"
+                           ngbTooltipClass="{{ (isSecondaryFromRso ? 'rdpzsd.personPreviousEducation.prevEducationSecondaryHint' : isHighSchoolNotFromRegister 
+                                                                   ? 'rdpzsd.personPreviousEducation.prevEducationHighSchoolHint' : null) | translate}}"
+                           iconTooltipClass="{{ isSecondaryFromRso || isHighSchoolNotFromRegister ? 'primary-tooltip' : null }}"
+                           [isCollapsed]="!isEditMode || personStudent.id > 0">
+                         
+            <person-previous-education body
+                                       #personPreviousEducation
+                                       [part]="personStudent"
+                                       (highSchoolNotFromRegisterEmitter)="setHighSchoolNotFromRegister($event)"
+                                       (secondaryFromRsoEmitter)="setSecondaryFromRso($event)"
+                                       [isEditMode]="isEditMode"
+                                       [disabledPeType]="educationalQualificationFilter?.alias === masterHigh || personStudent.institutionSpeciality?.speciality?.educationalQualification?.alias === masterHigh"
+                                       [isDoctoral]="false">
+            </person-previous-education>
+        </collapsable-label>
+    </div>
+</form>

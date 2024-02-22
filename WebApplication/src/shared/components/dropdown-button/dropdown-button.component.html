@@ -1,0 +1,16 @@
+<div class="dropdown">
+  <button [class]="btnClass"
+          [class.dropdown-toggle]="toggleable"
+          (click)="toggle()"
+          [disabled]="disabled">
+    <span [class]="icon"></span>
+    <span [class]="textClass"
+          class="me-1 ms-1">{{text}}</span>
+  </button>
+  <ul *ngIf="toggleable"
+      class="dropdown-menu {{dropdownRightClass}}"
+      (click)="toggle()"
+      [class.show]="opened">
+    <ng-content></ng-content>
+  </ul>
+</div>

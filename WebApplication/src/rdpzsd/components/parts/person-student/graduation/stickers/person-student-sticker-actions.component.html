@@ -1,0 +1,54 @@
+<div
+     *ngIf="userDataService.isRsdUser() 
+         && institutionId === userDataService.userData.institution.id 
+         && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)
+         && (currentStickerState === studentStickerState.returnedForEdit || currentStickerState === studentStickerState.none || currentStickerState === studentStickerState.recieved)">
+    <sync-button *ngIf="studentStatusAlias === studentStatusProcessGraduation
+                && (currentStickerState === studentStickerState.returnedForEdit || currentStickerState === studentStickerState.none)"
+                 btnClass="btn btn-primary btn-sm"
+                 text="root.buttons.sendForSticker"
+                 [click]="sendForSticker"
+                 [clickContext]="this">
+    </sync-button>
+
+    <sync-button *ngIf="studentEventAlias === studentEventGraduatedWithoutDiploma
+                && currentStickerState === studentStickerState.recieved"
+                 btnClass="btn btn-primary btn-sm"
+                 text="root.buttons.reissueSticker"
+                 [click]="reissueSticker"
+                 [clickContext]="this">
+    </sync-button>
+</div>
+
+<div
+     *ngIf="userDataService.isEmsStickersUser() 
+        && currentPersonContextService.openedFromStickers
+        && (currentStickerState === studentStickerState.stickerForPrint || currentStickerState === studentStickerState.sendForStickerDiscrepancy 
+        || currentStickerState === studentStickerState.sendForSticker || currentStickerState === studentStickerState.reissueSticker)">
+    <sync-button *ngIf="studentStatusAlias === studentStatusProcessGraduation 
+                    && currentStickerState === studentStickerState.sendForStickerDiscrepancy"
+                 btnClass="btn btn-danger btn-sm"
+                 text="root.buttons.return"
+                 [click]="returnForEdit"
+                 [clickParams]="[partId]"
+                 [clickContext]="this">
+    </sync-button>
+
+    <sync-button *ngIf="(studentStatusAlias === studentStatusProcessGraduation || studentEventAlias === studentEventGraduatedWithoutDiploma)
+                    && (currentStickerState === studentStickerState.sendForStickerDiscrepancy || currentStickerState === studentStickerState.sendForSticker || currentStickerState === studentStickerState.reissueSticker)"
+                 btnClass="btn btn-primary btn-sm ms-2"
+                 text="root.buttons.forPrint"
+                 [click]="forPrint"
+                 [clickParams]="[partId]"
+                 [clickContext]="this">
+    </sync-button>
+
+    <sync-button *ngIf="studentEventAlias === studentEventGraduatedWithoutDiploma 
+                    && currentStickerState === studentStickerState.stickerForPrint"
+                 btnClass="btn btn-primary btn-sm"
+                 text="root.buttons.recieved"
+                 [click]="receive"
+                 [clickParams]="[partId]"
+                 [clickContext]="this">
+    </sync-button>
+</div>

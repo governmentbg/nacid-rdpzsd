@@ -1,0 +1,114 @@
+<collapsable-section [isCollapsed]="isCollapsed"
+                     classHeader="heading"
+                     heading="{{ personSecondary.partInfo.actionDate | date: 'dd.MM.yyyy, hh:mm'}}, {{personSecondary.partInfo?.institution?.shortName ? personSecondary.partInfo?.institution?.shortName : ''}}{{personSecondary.partInfo?.subordinate?.shortName ? personSecondary.partInfo?.subordinate?.shortName : ''}} ({{personSecondary.partInfo.userFullname}}) - {{'enums.partState.' + partState[personSecondary.state] | translate}}">
+                     <div body>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.country' | translate }}</label>
+                                <input type="text"
+                                       class="form-control form-control-sm"
+                                       value="{{personSecondary.country.name}}"
+                                       disabled />
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.graduationYear' | translate }}</label>
+                                <input type="text"
+                                        class="form-control form-control-sm"
+                                        value="{{personSecondary.graduationYear}}"
+                                        disabled />
+                            </div>
+    
+                            <div *ngIf="personSecondary.country.code === 'BG' && !personSecondary.missingSchoolFromRegister"
+                                    class="col-md-4">
+                                <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.school' | translate }}</label>
+                                <input type="text"
+                                       class="form-control form-control-sm"
+                                       value="{{personSecondary.school?.name}}"
+                                       disabled/>
+                            </div>
+
+                              <div *ngIf="personSecondary.country.code === 'BG' && personSecondary.missingSchoolFromRegister"
+                                    class="col-md-4">
+                                <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.school' | translate }}</label>
+                                <input type="text"
+                                       class="form-control form-control-sm"
+                                       value="{{personSecondary.missingSchoolName}}"
+                                       disabled/>
+                            </div>
+    
+                            <div *ngIf="personSecondary.country.code !== 'BG'"
+                                    class="col-md-7">
+                                <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.school' | translate }}</label>
+                                <input type="text"
+                                        class="form-control form-control-sm"
+                                        value="{{ personSecondary.foreignSchoolName }}"
+                                        disabled/>
+                            </div>
+    
+                            <div *ngIf="personSecondary.country.code === 'BG' && !personSecondary.missingSchoolFromRegister"
+                                    class="col-md-3">
+                                <label class="form-label fs-14">{{ 'nomenclature.settlement.name' | translate }}</label>
+                                <input type="text"
+                                        class="form-control form-control-sm"
+                                        value="{{ personSecondary.school?.settlement?.name }}"
+                                        disabled />
+                            </div>
+
+                             <div *ngIf="personSecondary.country.code === 'BG' && personSecondary.missingSchoolFromRegister"
+                                    class="col-md-3">
+                                <label class="form-label fs-14">{{ 'nomenclature.settlement.name' | translate }}</label>
+                                <input type="text"
+                                        class="form-control form-control-sm"
+                                        value="{{ personSecondary.missingSchoolSettlement?.name }}"
+                                        disabled />
+                            </div>
+                        </div>
+    
+                        <div class="row g-3">
+                            <div class="col-md-5">
+                                <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.profession' | translate }}</label>
+                                <input type="text"
+                                       class="form-control form-control-sm"
+                                       value="{{ personSecondary.profession }}"
+                                       disabled/>
+                            </div>
+    
+                            <div class="col-md-4">
+                                <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.diplomaNumber' | translate }}</label>
+                                <input type="text"
+                                       class="form-control form-control-sm"
+                                       value="{{ personSecondary.diplomaNumber }}"
+                                       disabled />
+                            </div>
+    
+                            <div class="col-md-3">
+                                <label class="form-label fs-14">{{ 'rdpzsd.personSecondary.diplomaDate' | translate }}</label>
+                                <date-time [ngModel]="personSecondary.diplomaDate"
+                                           [disabled]="true"></date-time>
+                            </div>
+                        </div>
+
+						<div class="row g-3" *ngIf="personSecondary.country.code !== 'BG'">
+							<div class="col-md-4">
+								<label class="form-label fs-14">{{ 'rdpzsd.personSecondary.recognitionNumber' | translate}}</label>
+								<input type="text"
+										 class="form-control form-control-sm"
+										 value="{{personSecondary.recognitionNumber}}"
+										 disabled/>
+							</div>
+
+							<div class="col-md-3">
+								<label class="form-label fs-14">{{ 'rdpzsd.personSecondary.recognitionDate' | translate}}</label>
+								<date-time [ngModel]="personSecondary.recognitionDate"
+                                           [disabled]="true"></date-time>
+							</div>
+
+							<div class="col-md-5">
+								<label class="form-label fs-14">{{ 'rdpzsd.personSecondary.recognitionDocument' | translate}}</label>
+								<file-upload [disabled]="true"
+												 [ngModel]="personSecondary.personSecondaryRecognitionDocument">
+								</file-upload>
+							</div>
+						</div>
+                    </div>
+</collapsable-section>

@@ -1,0 +1,12 @@
+<div class="dropdown cursor-pointer"
+	 (mouseenter)="toggle(true)"
+	 (mouseleave)="toggle(false)">
+	<a class="dropdown-item d-flex justify-content-start align-items-center">
+		<div class="fas fa-angle-left"></div>
+		<div class="ms-2">{{text}}</div>
+	</a>
+	<ul class="dropdown-menu dropdown-left-submenu"
+		[class.show]="opened">
+		<ng-content></ng-content>
+	</ul>
+</div>

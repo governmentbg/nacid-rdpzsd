@@ -1,0 +1,30 @@
+<div class="d-flex h-100 align-items-end">
+    <ng-container *ngIf="!loadingData; else loadingSection">
+        <ng-container *ngIf="personSecondary">
+            <div class="mb-1 fs-16">
+                <u class="link-primary cursor-pointer no-text-decoration"
+                   (click)="showSecondaryPart()">
+                    <span>{{ personSecondary.graduationYear }}, {{ personSecondary.school?.name || personSecondary.foreignSchoolName || personSecondary.missingSchoolName }}</span>
+                    <span *ngIf="personSecondary.profession">, {{ personSecondary.profession }}</span>
+                </u>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="!personSecondary && isEditMode">
+            <div class="btn-group ms-3">
+                <sync-button btnClass="btn btn-primary btn-sm"
+                             text="root.buttons.addSecondary"
+                             [click]="showSecondaryPart"
+                             [clickContext]="this"
+                             icon="fas fa-plus">
+                </sync-button>
+            </div>
+        </ng-container>
+    </ng-container>
+
+    <ng-template #loadingSection>
+        <loading-section [loadingText]="null"
+                         marginSize="0"
+                         iconSize="fa-2x"></loading-section>
+    </ng-template>
+</div>

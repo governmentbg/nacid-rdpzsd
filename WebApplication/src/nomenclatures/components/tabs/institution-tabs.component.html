@@ -1,0 +1,22 @@
+<div class="container">
+  <nav ngbNav
+       #nav="ngbNav"
+       [(activeId)]="activeTab"
+       class="nav-tabs">
+    <ng-container ngbNavItem="Institution">
+      <a ngbNavLink>{{ 'nomenclature.institution.title' | translate }}</a>
+      <ng-template ngbNavContent>
+        <institution-search></institution-search>
+      </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="Subordinate">
+      <a ngbNavLink>{{ 'nomenclature.subordinate.title' | translate }}</a>
+      <ng-template ngbNavContent>
+        <subordinate-search></subordinate-search>
+      </ng-template>
+    </ng-container>
+  </nav>
+
+  <div [ngbNavOutlet]="nav"
+       class="mt-2"></div>
+</div>

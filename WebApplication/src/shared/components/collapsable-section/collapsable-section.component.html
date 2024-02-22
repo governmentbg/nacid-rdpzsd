@@ -1,0 +1,48 @@
+<div class="card mt-4">
+  <div class="card-header cursor-pointer {{classHeader}}"
+       (click)="onToggle()">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-baseline">
+        <span *ngIf="!icon"
+              class="fa fa-md"
+              style="min-width: 18px;"
+              [class.fa-chevron-right]="isCollapsed && !disabled"
+              [class.fa-chevron-down]="!isCollapsed && !disabled"></span>
+        <span *ngIf="icon"
+              class="fa {{icon}} fa-md"
+              style="min-width: 18px;"></span>
+        <div class="ms-2">
+          <div class="d-flex">
+            <div>
+              {{ heading }}
+            </div>
+
+            <div class="ms-2">
+              <ng-content select="[additionalHeader]">
+              </ng-content>
+            </div>
+          </div>
+
+          <div class="d-flex">
+            <ng-content select="[subHeader]">
+            </ng-content>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end">
+        <div class="btn-group"
+             (click)="$event.stopPropagation()">
+          <ng-content select="[buttons]"></ng-content>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div #collapse="ngbCollapse"
+       [(ngbCollapse)]="isCollapsed">
+    <div class="card-body">
+      <ng-content select="[body]"></ng-content>
+    </div>
+  </div>
+</div>

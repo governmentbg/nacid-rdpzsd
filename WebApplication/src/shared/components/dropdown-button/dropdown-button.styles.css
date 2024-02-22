@@ -1,0 +1,11 @@
+.dropdown-right {
+	left: unset;
+	right: 0;
+	margin-top: 3px;
+}
+
+.dropdown-right-top-0 {
+	left: unset;
+	right: 0;
+	margin-top: 0px;
+}

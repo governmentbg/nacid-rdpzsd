@@ -1,0 +1,172 @@
+<collapsable-section [isCollapsed]="isCollapsed"
+                     classHeader="heading"
+                     heading="{{ personBasic.partInfo.actionDate | date: 'dd.MM.yyyy, hh:mm'}}, {{personBasic.partInfo?.institution?.shortName ? personBasic.partInfo?.institution?.shortName : ''}}{{personBasic.partInfo?.subordinate?.shortName ? personBasic.partInfo?.subordinate?.shortName : ''}} ({{personBasic.partInfo.userFullname}}) - {{'enums.partState.' + partState[personBasic.state] | translate}}">
+    <div body>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'rdpzsd.personBasic.firstName' | translate }}</label>
+
+                <div class="input-group input-group-sm">
+                    <input type="text"
+                           class="form-control form-control-sm fw-bold"
+                           value="{{personBasic.firstName}}"
+                           disabled />
+                </div>
+
+                <div class="input-group input-group-sm mt-1">
+                    <input type="text"
+                           class="form-control form-control-sm fw-bold"
+                           value="{{personBasic.firstNameAlt}}"
+                           disabled />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'rdpzsd.personBasic.middleName' | translate }}</label>
+                <div class="input-group input-group-sm">
+                    <input type="text"
+                           class="form-control form-control-sm fw-bold"
+                           value="{{personBasic.middleName}}"
+                           disabled />
+                </div>
+
+                <div class="input-group input-group-sm mt-1">
+                    <input type="text"
+                           class="form-control form-control-sm fw-bold"
+                           value="{{personBasic.middleNameAlt}}"
+                           disabled />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'rdpzsd.personBasic.lastName' | translate }}</label>
+                <div class="input-group input-group-sm">
+                    <input type="text"
+                           class="form-control form-control-sm fw-bold"
+                           value="{{personBasic.lastName}}"
+                           disabled />
+                </div>
+                <div class="input-group input-group-sm mt-1">
+                    <input type="text"
+                           class="form-control form-control-sm fw-bold"
+                           value="{{personBasic.lastNameAlt}}"
+                           disabled />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'rdpzsd.personBasic.otherNames' | translate }}</label>
+                <div class="input-group input-group-sm">
+                    <input type="text"
+                           class="form-control form-control-sm fw-bold"
+                           value="{{personBasic.otherNames}}"
+                           disabled />
+                </div>
+                <div class="input-group input-group-sm mt-1">
+                    <input type="text"
+                           class="form-control form-control-sm fw-bold"
+                           value="{{personBasic.otherNamesAlt}}"
+                           disabled />
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">{{ 'rdpzsd.personBasic.uin' | translate }}</span>
+                    <input type="text"
+                           class="form-control form-control-sm fw-bold"
+                           value="{{personBasic.uin}}"
+                           disabled />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">{{ 'rdpzsd.personBasic.foreignerNumber' | translate
+                        }}</span>
+                    <input type="text"
+                           class="form-control form-control-sm fw-bold"
+                           value="{{personBasic.foreignerNumber}}"
+                           disabled />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">{{ 'rdpzsd.personBasic.idn' | translate }}</span>
+                    <input type="text"
+                           class="form-control form-control-sm fw-bold"
+                           value="{{personBasic.idnNumber}}"
+                           disabled />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">{{ 'rdpzsd.personBasic.gender' | translate }}</span>
+                    <input type="text"
+                           class="form-control form-control-sm fw-bold"
+                           value="{{ 'enums.genderType.' + genderType[personBasic.gender] | translate }}"
+                           disabled />
+                </div>
+            </div>
+        </div>
+
+        <ngb-accordion #acc="ngbAccordion">
+            <ngb-panel title="{{ 'rdpzsd.personBasic.birthPlace' | translate }}">
+                <ng-template ngbPanelContent>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <span><b>{{ personBasic.birthDate | date: 'dd.MM.yyyy' }},
+                                    <span *ngIf="personBasic.birthCountry && personBasic.birthCountry?.code === 'BG'">
+                                        {{ personBasic.birthSettlement?.name }}, </span>{{
+                                    personBasic.birthCountry?.name }}, </b>
+                                <span *ngIf="personBasic.birthCountry && personBasic.birthCountry?.code === 'BG'">
+                                    <b></b>
+                                    обл. {{ personBasic.birthDistrict?.name }},
+                                    общ. {{ personBasic.birthMunicipality?.name }},
+                                </span>
+                                <span>граж.: <b>{{ personBasic.citizenship?.name }}</b></span>
+                                <span *ngIf="personBasic.secondCitizenship">, <b>{{
+                                        personBasic.secondCitizenship?.name }}</b></span>
+                                <span *ngIf="personBasic.foreignerBirthSettlement">, {{ 'rdpzsd.personBasic.foreignerBirthSettlement' | translate }}: {{
+                                    personBasic.foreignerBirthSettlement }}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </ng-template>
+            </ngb-panel>
+            <ngb-panel title="{{ 'rdpzsd.personBasic.residence' | translate }}">
+                <ng-template ngbPanelContent>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <span><b>
+                                    <span
+                                          *ngIf="personBasic.residenceCountry && personBasic.residenceCountry?.code === 'BG'">
+                                        {{ personBasic.residenceSettlement?.name }},</span>
+                                    {{ personBasic.residenceCountry?.name }}, </b>
+                                <span
+                                      *ngIf="personBasic.residenceCountry && personBasic.residenceCountry?.code === 'BG'">
+                                    <span *ngIf="personBasic.postCode">п.к.: {{
+                                        personBasic.postCode }}, </span>
+                                    <span>Обл. {{ personBasic.residenceDistrict?.name }},
+                                    Общ. {{ personBasic.residenceMunicipality?.name }}, </span>
+                                </span>
+                                <span *ngIf="personBasic.residenceAddress">{{
+                                    personBasic.residenceAddress }}, </span>
+                                <a *ngIf="personBasic.email"
+                                   href="mailto:{{personBasic.email}}">{{
+                                    personBasic.email}}</a>
+                                <span *ngIf="personBasic.phoneNumber">, тел.: {{
+                                    personBasic.phoneNumber }}</span>
+                            </span>
+                        </div>
+                    </div>
+                </ng-template>
+            </ngb-panel>
+        </ngb-accordion>
+    </div>
+</collapsable-section>

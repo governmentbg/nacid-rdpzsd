@@ -1,0 +1,258 @@
+<collapsable-section heading="{{ part?.institution 
+    ? part?.institution?.shortName + (part?.institutionSpeciality?.speciality 
+    ? ' - ' + part?.institutionSpeciality?.speciality?.name + ' - ' + part?.institutionSpeciality?.speciality?.educationalQualification?.name + ' - ' + part?.institutionSpeciality?.educationalForm?.name + ' - ' + part?.institutionSpeciality?.duration + ' год.'
+      : '')
+    : '' }}"
+                     [disabled]="currentPersonContext.isInEdit"
+                     [(isCollapsed)]="collapsed">
+
+    <person-student-sticker-validation-info *ngIf="part && part.id
+        && configuration.enableFullFunctionality
+        && personLotState === lotState.actual
+        && part.state === partState.actual
+        && part.studentStatus?.alias === studentStatusProcessGraduation
+        && (userDataService.isEmsUser() 
+            || (userDataService.isRsdUser() && part.institutionId === userDataService.userData.institution.id && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)))"
+                                            #stickerValidationInfo
+                                            additionalHeader
+                                            [partId]="part.id">
+    </person-student-sticker-validation-info>
+
+    <person-semester-subheader *ngIf="part"
+                               subHeader
+                               [studentStatus]="part.studentStatus"
+                               [studentEvent]="part.studentEvent"
+                               [period]="part?.semesters[0]?.period"
+                               [studentCourse]="part?.semesters[0]?.individualPlanCourse ?? part?.semesters[0]?.course"
+                               [studentSemester]="part?.semesters[0]?.individualPlanSemester ?? part?.semesters[0]?.studentSemester">
+    </person-semester-subheader>
+
+    <div *ngIf="personLotId && part"
+         buttons
+         class="d-flex align-items-center">
+        <person-student-sticker-actions *ngIf="part.id
+                && personLotState === lotState.actual
+                && part.state === partState.actual
+                && (part.studentStatus?.alias === studentStatusProcessGraduation || part.studentEvent?.alias === studentEventGraduatedWithoutDiploma)
+                && part.protocols?.length > 0
+                && !collapsed
+                && !currentPersonContext.isInEdit"
+                                        [(currentStickerState)]="part.stickerState"
+                                        (stickerYearChange)="part.stickerYear = $event"
+                                        [partId]="part.id"
+                                        [institutionId]="part.institutionId"
+                                        [studentEventAlias]="part.studentEvent?.alias"
+                                        [studentStatusAlias]="part.studentStatus?.alias">
+        </person-student-sticker-actions>
+
+        <part-actions *ngIf="(userDataService.isEmsUser() 
+                                || (userDataService.isRsdUser() && part.institutionId === userDataService.userData.institution.id && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)))
+                            && personLotState === lotState.actual"
+                      [model]="part"
+                      (modelChange)="modelChange($event)"
+                      [(isEditMode)]="isEditMode"
+                      [invalidForm]="!isValidForm"
+                      [hideEditActions]="!configuration.enableFullFunctionality || part.studentStatus?.alias === studentStatusGraduated || collapsed || !userDataService.isRsdUser() || (part.stickerState && !(part.stickerState === studentStickerState.none || part.stickerState === studentStickerState.returnedForEdit))"
+                      [enableErase]="part?.semesters?.length === 1"
+                      (showHistoryEvent)="showHistory($event)"
+                      restUrl="PersonStudent">
+        </part-actions>
+    </div>
+
+    <person-student *ngIf="part"
+                    body
+                    [personStudent]="part"
+                    [isEditMode]="isEditMode"
+                    [(isValidForm)]="isValidForm">
+    </person-student>
+
+    <div *ngIf="part"
+         class="mt-3"
+         body>
+        <collapsable-label heading="rdpzsd.personSemester.specialityTitle"
+                           fontSize="fs-16"
+                           [isCollapsed]="part.studentStatus?.alias === studentStatusGraduated || part.studentStatus?.alias === studentStatusProcessGraduation"
+                           [disabled]="part.studentStatus?.alias !== studentStatusGraduated && part.studentStatus?.alias !== studentStatusProcessGraduation">
+            <div buttons
+                 *ngIf="part.semesters[0] && part?.id && !currentPersonContext.isInEdit
+                    && configuration.enableFullFunctionality
+                    && personLotState === lotState.actual
+                    && part?.state === partState.actual
+                    && part?.studentStatus?.alias !== studentStatusGraduated
+                    && userDataService.isRsdUser() 
+                    && (part?.institutionId === userDataService.userData.institution.id || rsdUserForJointSpecialityCanAccessSemester()) 
+                    && (part?.stickerState ===  studentStickerState.none || part?.stickerState === studentStickerState.returnedForEdit)
+                    && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)">
+                <div class="d-flex justify-content-center">
+                    <sync-button *ngIf="part.semesters[0].studentStatus?.alias === studentStatusActive || part.semesters[0].studentStatus?.alias === studentStatusInterrupted || part.semesters[0].studentStatus?.alias === studentStatusProcessGraduation"
+                                 btnClass="btn btn-primary btn-sm ms-2"
+                                 text="Приключване"
+                                 [click]="nextSemester"
+                                 [clickParams]="[studentStatusCompleted]"
+                                 [clickContext]="this">
+                    </sync-button>
+
+                    <sync-button *ngIf="part.semesters[0].studentStatus?.alias === studentStatusActive || part.semesters[0].studentStatus?.alias === studentStatusInterrupted"
+                                 btnClass="btn btn-danger btn-sm ms-2"
+                                 text="Прекъсване"
+                                 [click]="nextSemester"
+                                 [clickParams]="[studentStatusInterrupted]"
+                                 [clickContext]="this">
+                    </sync-button>
+
+                    <sync-button *ngIf="part.semesters[0].studentStatus?.alias === studentStatusActive 
+                        || part.semesters[0].studentStatus?.alias === studentStatusInterrupted 
+                        || part.semesters[0].studentEvent?.alias === studentEventLeftOwnWill
+                        || part.semesters[0].studentEvent?.alias === studentEventRemovalNonFulfillment"
+                                 btnClass="btn btn-primary btn-sm ms-2"
+                                 titleText="Прехвърляне в следващ семестър"
+                                 [text]="part.semesters[0].studentStatus?.alias === studentStatusCompleted ? 'Възстанови студентски права' : 'Следващ семестър'"
+                                 [click]="nextSemester"
+                                 [clickParams]="[studentStatusActive]"
+                                 [clickContext]="this">
+                    </sync-button>
+
+                    <sync-button *ngIf="(part.semesters[0].studentStatus?.alias === studentStatusActive || part.semesters[0].studentStatus?.alias === studentStatusProcessGraduation) && lastActiveSemester"
+                                 btnClass="btn btn-primary btn-sm ms-2"
+                                 [text]="part.semesters[0].studentStatus?.alias === studentStatusActive ? 'Семестриално завършил' : 'Отлагане на дипломиране'"
+                                 [click]="nextSemester"
+                                 [clickParams]="[studentStatusProcessGraduation]"
+                                 [clickContext]="this">
+                    </sync-button>
+                </div>
+            </div>
+
+            <table body
+                   class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th class="col-1-5">{{ 'nomenclature.studentStatus.name' | translate }}</th>
+                        <th class="col-3">{{ 'nomenclature.studentEvent.name' | translate }}</th>
+                        <th class="col-2">{{ 'nomenclature.period.titleSingular' | translate }}</th>
+                        <th class="col-2">{{ 'rdpzsd.personStudent.course' | translate}}</th>
+                        <th class="col-2">{{ 'nomenclature.educationFeeType.shortTitle' | translate }}</th>
+                        <th class="col-1-5 center-text-th">
+                            {{ 'root.results.actions' | translate }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-template ngFor
+                                 let-semester
+                                 [ngForOf]="part.semesters"
+                                 let-i="index">
+                        <tr person-student-semester
+                            #semesterComponent
+                            [isRegulatedSpeciality]="part?.institutionSpeciality?.speciality?.isRegulated"
+                            [lastActiveSemester]="lastActiveSemester"
+                            [semester]="semester"
+                            [personStudentStatusAlias]="part?.studentStatus?.alias"
+                            [stickerState]="part?.stickerState"
+                            [personLotState]="personLotState"
+                            [partState]="part?.state"
+                            [partId]="part?.id"
+                            [institutionId]="part?.institutionId"
+                            [educationalQualificationId]="part?.institutionSpeciality?.speciality?.educationalQualificationId"
+                            [previousPeriod]="part.semesters[i+1]?.period"
+                            [semesterIndex]="i"
+                            [enablePeriodAndEventEdit]="part?.semesters?.length === 1"
+                            [admissionReason]="part?.admissionReason"
+                            [specialityDuration]="part?.institutionSpeciality?.duration"
+                            [institutionSpeciality]="part?.institutionSpeciality"
+                            (removeSemester)="removeSemester(i)"
+                            (updateSemester)="updateSemester(i, $event)"
+                            [class.bc-yellow]="semesterComponent.isEditMode && part?.id > 0">
+                        </tr>
+                        <tr *ngIf="semester.relocatedFromPart && semesterComponent && !semesterComponent.isEditMode">
+                            <td colspan="6">
+                                <label class="form-label fs-14">{{ 'rdpzsd.personSemester.relocatedFromPart' | translate
+                                    }}</label>:
+                                ({{semester.relocatedFromPart.institution.shortName}} -
+                                {{semester.relocatedFromPart.subordinate.name}})
+                                {{semester.relocatedFromPart.institutionSpeciality.speciality.name}} -
+                                {{semester.relocatedFromPart.studentEvent.name}}
+                            </td>
+                        </tr>
+
+                        <tr *ngIf="semester.note && semesterComponent && !semesterComponent.isEditMode">
+                            <td colspan="6">
+                                <label class="form-label fs-14">{{ 'rdpzsd.personSemester.note' | translate }}</label>:
+                                {{ semester.note }}
+                            </td>
+                        </tr>
+                    </ng-template>
+                </tbody>
+            </table>
+        </collapsable-label>
+    </div>
+
+    <div *ngIf="part 
+        && part.id
+        && (part.studentStatus?.alias === studentStatusGraduated 
+            || part.studentStatus?.alias === studentStatusProcessGraduation
+            || part.protocols?.length > 0)"
+         class="mt-3"
+         body>
+        <collapsable-label heading="rdpzsd.personDiploma.title"
+                           fontSize="fs-16"
+                           [isCollapsed]="part.studentStatus?.alias !== studentStatusProcessGraduation && part.studentEvent?.alias !== studentEventGraduatedWithoutDiploma">
+            <div body>
+                <div *ngIf="part.stickerYear"
+                     class="row g-3">
+                    <div class="col-md-2">
+                        <label class="form-label fs-14">{{ 'rdpzsd.personStudent.stickers.year' | translate }}</label>
+                        <input type="text"
+                               class="form-control form-control-sm"
+                               [(ngModel)]="part.stickerYear"
+                               name="stickerYear"
+                               disabled />
+                    </div>
+
+                    <div *ngIf="part.stickerNotes?.length > 0 
+                    && (userDataService.isEmsUser() 
+                        || (userDataService.isRsdUser() && part.institutionId === userDataService.userData.institution.id && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)))"
+                         class="col-md-10">
+                        <div class="d-flex h-100 align-items-end">
+                            <div class="mb-1 fs-16">
+                                <u class="link-primary cursor-pointer"
+                                   (click)="openStickerNotesModal()">
+                                    {{ 'rdpzsd.personStudent.stickers.notes' | translate }}
+                                </u>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <person-student-protocol [protocols]="part.protocols"
+                                         [partState]="part.state"
+                                         [institutionId]="part.institutionId"
+                                         [personLotState]="personLotState"
+                                         [stickerState]="part.stickerState"
+                                         [studentStatusAlias]="part.studentStatus?.alias"
+                                         (addProtocolEvent)="addProtocol()"
+                                         (removeProtocolEvent)="removeProtocol($event)">
+                </person-student-protocol>
+
+                <person-student-diploma *ngIf="part.stickerState === studentStickerState.recieved"
+                                        [partId]="part.id"
+                                        [diploma]="part.diploma"
+                                        [partState]="part.state"
+                                        [institutionId]="part.institutionId"
+                                        [personLotState]="personLotState"
+                                        [studentEventAlias]="part.studentEvent?.alias"
+                                        (updateStudentEvent)="updateStudentEvent()"
+                                        (updateDiplomaEvent)="part.diploma = $event">
+                </person-student-diploma>
+
+                <person-student-duplicate-diploma *ngIf="part?.diploma?.id && !part?.diploma?.isValid"
+                                                  [duplicateDiplomas]="part.duplicateDiplomas"
+                                                  [partId]="part.id"
+                                                  [partState]="part.state"
+                                                  [institutionId]="part.institutionId"
+                                                  [personLotState]="personLotState"
+                                                  [studentEventAlias]="part.studentEvent?.alias">
+                </person-student-duplicate-diploma>
+            </div>
+        </collapsable-label>
+    </div>
+</collapsable-section>

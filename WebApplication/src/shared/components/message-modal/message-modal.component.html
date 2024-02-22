@@ -1,0 +1,17 @@
+<div class="modal-header p-4">
+  <div>
+    <strong *ngIf="warning" class="text-red">{{ warning | translate }}</strong>
+    <span *ngIf="warningText" class="text-red">{{ warningText | translate }}</span>
+    {{ text | translate }}
+  </div>
+</div>
+<div class="modal-body p-3">
+  <div class="d-flex justify-content-end">
+    <button *ngIf="!infoOnly"
+             class="btn {{acceptButtonClass}}"
+            (click)="accept()">{{ acceptButton | translate }}</button>
+    <button ngbAutofocus
+            class="btn {{declineButtonClass}} ms-2"
+            (click)="decline()">{{ declineButton | translate }}</button>
+  </div>
+</div>

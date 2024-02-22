@@ -1,0 +1,270 @@
+
+<div class="card no-border shadow mt-4">
+    <div class="card-body">
+      <div class="mb-4">
+        <button type="button"
+                class="btn"
+                (click)="changeFilterType(personNewFilterType.identificationNumber)"
+                [ngClass]="{'btn-primary': filter.filterType === personNewFilterType.identificationNumber, 'btn-outline-primary' : filter.filterType === personNewFilterType.birthPlace }">
+          {{ 'enums.personLotNewFilterType.identificationNumber' | translate }}
+        </button>
+        <button type="button"
+                class="btn ms-2"
+                (click)="changeFilterType(personNewFilterType.birthPlace)"
+                [ngClass]="{'btn-primary': filter.filterType === personNewFilterType.birthPlace, 'btn-outline-primary' : filter.filterType === personNewFilterType.identificationNumber }">
+          {{ 'enums.personUanExportFilterType.foreigners' | translate }}
+        </button>
+      </div>
+
+      <form #searchForm="ngForm"
+            autocomplete="off">
+        <div>
+          <div class="row g-3">
+            <div class="col-md-3"
+              *ngIf="filter.filterType === personNewFilterType.identificationNumber">
+              <label for="uan"
+                     class="form-label fs-14">{{ 'rdpzsd.personLot.uanShort' | translate }}</label>
+              <input type="text"
+                     class="form-control form-control-sm"
+                     [(ngModel)]="filter.uan"
+                     (ngModelChange)="filter.uan = $event.toUpperCase()"
+                     id="uan"
+                     uanValidation
+                     name="uan"
+                     minlength=7
+                     maxlength=7>
+            </div>
+
+            <div class="col-md-3"
+                *ngIf="filter.filterType === personNewFilterType.identificationNumber">
+              <label for="uin"
+                     class="form-label fs-14">{{ 'rdpzsd.personBasic.uin' | translate }}</label>
+              <input type="text"
+                     class="form-control form-control-sm"
+                     [(ngModel)]="filter.uin"
+                     id="uin"
+                     name="uin"
+                     numbersOnly
+                     maxlength="10"
+                     minlength="10"
+                     uinValidation
+                     [enableEmptyValidation]="true">
+            </div>
+
+            <div class="col-md-3"
+                *ngIf="filter.filterType === personNewFilterType.identificationNumber">
+              <label for="foreignerNumber"
+                     class="form-label fs-14">{{ 'rdpzsd.personBasic.foreignerNumber' | translate }}</label>
+              <input type="text"
+                     class="form-control form-control-sm"
+                     [(ngModel)]="filter.foreignerNumber"
+                     id="foreignerNumber"
+                     numbersOnly
+                     maxlength="10"
+                     minlength="10"
+                     name="foreignerNumber"
+                     foreignerNumberValidation
+                     [enableEmptyValidation]="true">
+            </div>
+
+            <div class="col-md-3"
+               *ngIf="filter.filterType === personNewFilterType.birthPlace">
+                <label class="form-label fs-14">{{ 'rdpzsd.personBasic.birthDate' | translate }}</label>
+                <invalid-field [element]="birthDate"
+                              text="invalidFields.birthDate"></invalid-field>
+                <date-time [(ngModel)]="filter.birthDate"
+                          name="birthDate"
+                          #birthDate="ngModel"
+                          [formControlClass]="birthDate.invalid && birthDate.value === null ? 'form-control form-control-sm form-control-invalid-static' : 'form-control form-control-sm'"></date-time>
+            </div>
+
+            <div class="col-md-3"
+               *ngIf="filter.filterType === personNewFilterType.birthPlace">
+                <label class="form-label fs-14">{{ 'rdpzsd.personBasic.birthPlace' | translate }}</label>
+                <nomenclature-select restUrl="Nomenclature/Country"
+                                    name="birthCountry"
+                                    [(ngModel)]="filter.birthCountry"
+                                    [filter]="{excludeCode: 'BG'}"
+                                    textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                    (keyPropertyChange)="filter.birthCountryId = $event">
+                </nomenclature-select>
+           </div>
+
+            <div class="col-md-3 d-flex align-items-end">
+              <sync-button btnClass="btn btn-primary btn-sm"
+                           [disabled]="searchForm.invalid 
+                           || (filter.filterType === personNewFilterType.identificationNumber && (!filter.uan && !filter.uin && !filter.foreignerNumber))"
+                           text="root.buttons.search"
+                           [click]="getData"
+                           [clickParams]="[false]"
+                           [clickContext]="this"
+                           icon="fas fa-search">
+              </sync-button>
+
+              <sync-button btnClass="btn btn-outline-primary btn-sm ms-3"
+                     text="root.buttons.clear"
+                     [click]="clear"
+                     [clickContext]="this"
+                     icon="fas fa-trash">
+              </sync-button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div class="d-flex mt-4 justify-content-start">
+        <sync-button btnClass="btn btn-outline-success btn-sm"
+                   text="root.buttons.excel"
+                   [click]="export"
+                   [disabled]="!searchResult.result.length"
+                   [clickContext]="this"
+                   icon="fas fa-download">
+       </sync-button>
+
+        <button *ngIf="searchResult.result.length > 0"
+                        class="btn btn-primary btn-sm ms-3"
+                        (click)="getDataCount()">
+                    <i style="min-width: 15px" [ngClass]="[loadingDataCount ? 'fas fa-sync fa-spin' : 'fas fa-info']"></i>
+        </button>
+
+        <a *ngIf="!dataCount && searchResult.result?.length > 0" 
+            [routerLink]="" 
+            class="no-text-decoration cursor-pointer fs-18 ms-2 mt-p2" 
+            (click)="getDataCount()">
+          {{ 'root.results.number' | translate }} {{ 'root.results.records' | translate }}
+        </a>
+
+        <div *ngIf="dataCount != null"
+            class="d-flex align-items-center ms-2">
+            <label class="fs-18">
+              <span *ngIf="!loadingData">
+                {{ 'root.results.total' | translate }} {{dataCount | formatNumber}}
+                {{ 'root.results.records' | translate }}
+              </span>
+            </label>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="filter.filterType === personNewFilterType.identificationNumber"
+         class="table-scrollable">
+    <table class="table table-bordered mt-4">
+      <thead class="table-light">
+        <tr>
+          <th class="col-3">{{ 'rdpzsd.personLot.uanShort' | translate }}</th>
+          <th class="col-3">{{ 'rdpzsd.personBasic.uin' | translate }}</th>
+          <th class="col-3">{{ 'rdpzsd.personBasic.foreignerNumber' | translate}}</th>
+        </tr>
+      </thead>
+      <tbody>
+      <ng-container *ngIf="!loadingData; else loadingSection">
+        <ng-container *ngIf="searchResult.result && searchResult.result.length > 0; else noResults">
+          <tr *ngFor="let person of searchResult.result">
+            <td>
+              <b>{{ person.uan }}</b>
+            </td>
+            <td>
+              <div *ngIf="person.uin">{{ person.uin }}</div>
+            </td>
+            <td>
+              <div *ngIf="person.foreignerNumber">{{ person.foreignerNumber }}</div>
+            </td>
+          </tr>
+        </ng-container>
+      </ng-container>
+      <ng-template #noResults>
+          <tr>
+            <td colspan="3"
+                class="col-12">
+              <i>{{ 'root.results.noResults' | translate }}</i>
+            </td>
+          </tr>
+        </ng-template>
+      <ng-template #loadingSection>
+          <tr>
+              <td colspan="3"
+                  class="col-12">
+                  <loading-section></loading-section>
+              </td>
+          </tr>
+      </ng-template>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="filter.filterType === personNewFilterType.birthPlace" 
+      class="table-scrollable">
+    <table class="table table-bordered mt-4">
+      <thead class="table-light">
+        <tr>
+          <th class="col-1">{{ 'rdpzsd.personLot.uanShort' | translate }}</th>
+          <th class="col-2">{{ 'rdpzsd.personBasic.idn' | translate }}</th>
+          <th class="col-2">{{ 'rdpzsd.personBasic.firstName' | translate}}</th>
+          <th class="col-2">{{ 'rdpzsd.personBasic.middleName' | translate}}</th>
+          <th class="col-2">{{ 'rdpzsd.personBasic.lastName' | translate}}</th>
+          <th class="col-3">{{ 'rdpzsd.searchMenu.birthCountryAndSettlement' | translate}}</th>
+        </tr>
+      </thead>
+      <tbody>
+      <ng-container *ngIf="!loadingData; else loadingSection">
+        <ng-container *ngIf="searchResult.result && searchResult.result.length > 0; else noResults">
+          <tr *ngFor="let person of searchResult.result">
+            <td>
+              <b>{{ person.uan }}</b>
+            </td>
+            <td>{{ person.personIdn }}</td>
+            <td>
+              <div>{{ person.firstName }}</div>
+              <div>{{ person.firstNameAlt }}</div>
+            </td>
+            <td>
+              <div>{{ person.middleName }}</div>
+              <div>{{ person.middleNameAlt }}</div>
+            </td>
+            <td>
+              <div>{{ person.lastName }}</div>
+              <div>{{ person.lastNameAlt }}</div>
+            </td>
+            <td>{{ person.birthDate | date: 'dd.MM.yyyy'}}, 
+              <span>{{translateService.currentLang === 'bg' ? person.birthCountry.name : person.birthCountry.nameAlt}}</span>
+              <span *ngIf="person.foreignerBirthSettlement">, {{ person.foreignerBirthSettlement }} </span>
+            </td>
+          </tr>
+        </ng-container>
+      </ng-container>
+      <ng-template #noResults>
+          <tr>
+            <td colspan="6"
+                class="col-12">
+              <i>{{ 'root.results.noResults' | translate }}</i>
+            </td>
+          </tr>
+        </ng-template>
+      <ng-template #loadingSection>
+          <tr>
+              <td colspan="6"
+                  class="col-12">
+                  <loading-section></loading-section>
+              </td>
+          </tr>
+      </ng-template>
+      </tbody>
+    </table>
+  </div>
+
+
+  <div *ngIf="!searched
+      && searchResult.result 
+      && searchResult.result.length > 0 && searchResult.result.length === filter.limit"
+       class="d-flex flex-row-reverse mt-2">
+    <div class="btn-group">
+      <sync-button btnClass="btn btn-primary"
+                   text="root.buttons.loadMore"
+                   [click]="getData" 
+                   [clickContext]="this"
+                   [clickParams]="[true, false]">
+      </sync-button>
+    </div>
+</div>

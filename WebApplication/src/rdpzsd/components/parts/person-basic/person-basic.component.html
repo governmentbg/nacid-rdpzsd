@@ -1,0 +1,315 @@
+<form #form="ngForm"
+      autocomplete="off">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <image-select #personImage="ngModel"
+                          name="personImage"
+                          [(ngModel)]="personBasic.personImage"
+                          [disabled]="!isEditMode || !configuration.enableFullFunctionality"
+                          [imageKey]="personBasic.personImage?.key"
+                          [carouselEnabled]="!isEditMode && personLotId !== null"
+                          carouselRestUrl="PersonLot/PersonBasic/{{personLotId}}/HistoryImages">
+            </image-select>
+        </div>
+
+        <div class="col-md-9">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personBasic.firstName' | translate }} {{
+                        'rdpzsd.personBasic.cyrillic' | translate }}</label>
+                    <invalid-field [element]="firstName"
+                                   text="invalidFields.cyrillicRequired">
+                    </invalid-field>
+                    <div class="input-group input-group-sm">
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid"
+                               [(ngModel)]="personBasic.firstName"
+                               name="firstName"
+                               #firstName="ngModel"
+                               [disabled]="!isEditMode"
+                               maxlength="50"
+                               minlength="2"
+                               cyrillicValidation />
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personBasic.middleName' | translate }} {{
+                        'rdpzsd.personBasic.cyrillic' | translate }}</label>
+                    <invalid-field [element]="middleName"
+                                   [requiredTouched]="false"
+                                   text="invalidFields.invalidMiddleName">
+                    </invalid-field>
+                    <div class="input-group input-group-sm">
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid"
+                               [(ngModel)]="personBasic.middleName"
+                               name="middleName"
+                               [required]="middleNameAlt.value?.length > 0 && middleNameAlt.valid"
+                               #middleName="ngModel"
+                               [disabled]="!isEditMode"
+                               cyrillicValidation
+                               maxlength="50"
+                               minlength="2"
+                               [enableEmptyValidation]="true" />
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personBasic.lastName' | translate }} {{
+                        'rdpzsd.personBasic.cyrillic' | translate }}</label>
+                    <invalid-field [element]="lastName"
+                                   text="invalidFields.cyrillicRequired">
+                    </invalid-field>
+                    <div class="input-group input-group-sm">
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid"
+                               [(ngModel)]="personBasic.lastName"
+                               name="lastName"
+                               #lastName="ngModel"
+                               [disabled]="!isEditMode"
+                               maxlength="50"
+                               minlength="2"
+                               cyrillicValidation />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personBasic.otherNames' | translate }} {{
+                        'rdpzsd.personBasic.cyrillic' | translate }}</label>
+                    <invalid-field [element]="otherNames"
+                                   [requiredTouched]="false"
+                                   text="invalidFields.invalidOtherNames"></invalid-field>
+                    <div class="input-group input-group-sm">
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid"
+                               [(ngModel)]="personBasic.otherNames"
+                               name="otherNames"
+                               #otherNames="ngModel"
+                               [required]="otherNamesAlt.value?.length > 0 && otherNamesAlt.valid"
+                               [disabled]="!isEditMode"
+                               cyrillicValidation
+                               maxlength="50"
+                               minlength="2"
+                               [enableEmptyValidation]="true" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personBasic.firstName' | translate }} {{
+                        'rdpzsd.personBasic.latin'
+                        | translate }}</label>
+                    <invalid-field [element]="firstNameAlt"
+                                   text="invalidFields.latinRequired"></invalid-field>
+                    <div class="input-group input-group-sm">
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid"
+                               [(ngModel)]="personBasic.firstNameAlt"
+                               name="firstNameAlt"
+                               #firstNameAlt="ngModel"
+                               [disabled]="!isEditMode"
+                               maxlength="50"
+                               minlength="2"
+                               latinValidation />
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personBasic.middleName' | translate }} {{
+                        'rdpzsd.personBasic.latin' | translate }}</label>
+                    <invalid-field [element]="middleNameAlt"
+                                   [requiredTouched]="false"
+                                   text="invalidFields.invalidMiddleNameAlt">
+                    </invalid-field>
+                    <div class="input-group input-group-sm">
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid"
+                               [(ngModel)]="personBasic.middleNameAlt"
+                               name="middleNameAlt"
+                               #middleNameAlt="ngModel"
+                               [required]="middleName.value?.length > 0 && middleName.valid"
+                               [disabled]="!isEditMode"
+                               latinValidation
+                               maxlength="50"
+                               minlength="2"
+                               [enableEmptyValidation]="true" />
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personBasic.lastName' | translate }} {{
+                        'rdpzsd.personBasic.latin'
+                        | translate }}</label>
+                    <invalid-field [element]="lastNameAlt"
+                                   text="invalidFields.latinRequired"></invalid-field>
+                    <div class="input-group input-group-sm">
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid"
+                               [(ngModel)]="personBasic.lastNameAlt"
+                               name="lastNameAlt"
+                               #lastNameAlt="ngModel"
+                               [disabled]="!isEditMode"
+                               maxlength="50"
+                               minlength="2"
+                               latinValidation />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personBasic.otherNames' | translate }} {{
+                        'rdpzsd.personBasic.latin' | translate }}</label>
+                    <invalid-field [element]="otherNamesAlt"
+                                   [requiredTouched]="false"
+                                   text="invalidFields.invalidOtherNamesAlt">
+                    </invalid-field>
+                    <div class="input-group input-group-sm">
+                        <input type="text"
+                               class="form-control form-control-sm form-control-invalid"
+                               [(ngModel)]="personBasic.otherNamesAlt"
+                               name="otherNamesAlt"
+                               #otherNamesAlt="ngModel"
+                               [disabled]="!isEditMode"
+                               latinValidation
+                               [required]="otherNames.value?.length > 0 && otherNames.valid"
+                               maxlength="50"
+                               minlength="2"
+                               [enableEmptyValidation]="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label fs-14">{{ 'rdpzsd.personBasic.uin' | translate }}</label>
+            <invalid-field [element]="uin"
+                           text="invalidFields.uin"></invalid-field>
+            <input type="text"
+                   class="form-control form-control-sm form-control-invalid"
+                   [(ngModel)]="personBasic.uin"
+                   (ngModelChange)="changeUin($event, personBasic, uin)"
+                   name="uin"
+                   #uin="ngModel"
+                   [disabled]="(!userDataService.isEmsEditUser() && uin.value && personBasic?.uin?.length === 10) || personLotState === lotState.cancelApproval || personLotState === lotState.missingPassportCopy || !isEditMode"
+                   uinValidation
+                   numbersOnly
+                   maxlength="10"
+                   minlength="10"
+                   [enableEmptyValidation]="true" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fs-14">{{ 'rdpzsd.personBasic.foreignerNumber' | translate }}</label>
+            <invalid-field [element]="foreignerNumber"
+                           text="invalidFields.foreignerNumber"></invalid-field>
+            <input type="text"
+                   class="form-control form-control-sm form-control-invalid"
+                   [(ngModel)]="personBasic.foreignerNumber"
+                   name="foreignerNumber"
+                   #foreignerNumber="ngModel"
+                   numbersOnly
+                   [disabled]="(!userDataService.isEmsEditUser() && foreignerNumber.value && personBasic?.foreignerNumber?.length === 10) || personLotState === lotState.cancelApproval || personLotState === lotState.missingPassportCopy || !isEditMode"
+                   foreignerNumberValidation
+                   maxlength="10"
+                   minlength="10"
+                   [enableEmptyValidation]="true" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fs-14">{{ 'rdpzsd.personBasic.idnNumber' | translate }}</label>
+            <invalid-field [element]="idnNumber"
+                           text="invalidFields.idnNumber"></invalid-field>
+            <input type="text"
+                   class="form-control form-control-sm form-control-invalid"
+                   [(ngModel)]="personBasic.idnNumber"
+                   name="idnNumber"
+                   [disabled]="!isEditMode"
+                   maxlength="25"
+                   minlength="6"
+                   [required]="personLotState === lotState.missingPassportCopy"
+                   customRegexValidation
+                   [enableEmptyValidation]="true"
+                   patternName="idnNumberRegex"
+                   (ngModelChange)="personBasic.idnNumber = $event.toUpperCase()"
+                   #idnNumber="ngModel" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fs-14">{{ 'rdpzsd.personBasic.passportCopy' | translate }}</label>
+            <invalid-field [element]="passportFile"
+                           text="invalidFields.required"></invalid-field>
+            <file-upload #passportFile="ngModel"
+                         name="passportFile"
+                         [required]="personLotState === lotState.missingPassportCopy"
+                         [hideNoFileUpload]="true"
+                         [disabled]="!isEditMode || !configuration.enableFullFunctionality"
+                         [(ngModel)]="personBasic.passportCopy"></file-upload>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label fs-14">{{ 'rdpzsd.personBasic.birthDate' | translate }}</label>
+            <invalid-field [element]="birthDate"
+                           text="invalidFields.required"></invalid-field>
+            <date-time [(ngModel)]="personBasic.birthDate"
+                       name="birthDate"
+                       [disabled]="!userDataService.isEmsEditUser() || (uin.value && uin.valid) || !isEditMode"
+                       [isBirthDate]="true"
+                       #birthDate="ngModel"
+                       [required]="true"></date-time>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fs-14">{{ 'rdpzsd.personBasic.gender' | translate }}</label>
+            <enum-select [(ngModel)]="personBasic.gender"
+                         name="gender"
+                         enumName="genderType"
+                         #gender="ngModel"
+                         [enumType]="genderType"
+                         [disabled]="!userDataService.isEmsEditUser() || (uin.value && uin.valid) || !isEditMode"
+                         [required]="true"></enum-select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fs-14">{{ 'rdpzsd.personBasic.email' | translate}}</label>
+            <invalid-field [element]="email"
+                           text="invalidFields.email"></invalid-field>
+            <input type="text"
+                   class="form-control form-control-sm form-control-invalid"
+                   [(ngModel)]="personBasic.email"
+                   #email="ngModel"
+                   name="email"
+                   maxlength="50"
+                   [hasNoEmail]="true"
+                   [disabled]="!isEditMode"
+                   emailValidation />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label fs-14">{{ 'rdpzsd.personBasic.phone' | translate}}</label>
+            <invalid-field [element]="phoneNumber"
+                           text="invalidFields.phone"></invalid-field>
+            <input type="text"
+                   class="form-control form-control-sm form-control-invalid"
+                   [(ngModel)]="personBasic.phoneNumber"
+                   #phoneNumber="ngModel"
+                   name="phoneNumber"
+                   maxlength="18"
+                   minlength="9"
+                   [disabled]="!isEditMode"
+                   phoneValidation />
+        </div>
+    </div>
+
+    <person-basic-additional-tabs [personBasic]="personBasic"
+                                  [isEditMode]="isEditMode">
+    </person-basic-additional-tabs>
+</form>

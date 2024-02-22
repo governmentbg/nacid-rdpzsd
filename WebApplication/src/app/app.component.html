@@ -1,0 +1,33 @@
+<app-header></app-header>
+
+<user-side-bar>
+</user-side-bar>
+
+<loading-page *ngIf="userDataService.currentAuthorizationState === userAuthorizationState.loading"></loading-page>
+
+<section *ngIf="userDataService.currentAuthorizationState === userAuthorizationState.login"
+         class="mt-3">
+  <div class="container d-flex justify-content-between">
+    <breadcrumb></breadcrumb>
+    <user-header></user-header>
+  </div>
+</section>
+
+<section *ngIf="configuration.environmentName"
+         [ngClass]="{'mt-3' : userDataService.currentAuthorizationState === userAuthorizationState.logout }">
+  <div class="container text-red">
+    <strong>{{ configuration.environmentName | translate }}</strong>
+  </div>
+</section>
+
+<section class="mt-3">
+  <alert-message></alert-message>
+</section>
+
+<section class="mb-5"
+         [ngClass]="{'mt-3': userDataService.currentAuthorizationState === userAuthorizationState.login, 'mt-5' : userDataService.currentAuthorizationState === userAuthorizationState.logout }">
+  <router-outlet>
+  </router-outlet>
+</section>
+
+<app-footer></app-footer>

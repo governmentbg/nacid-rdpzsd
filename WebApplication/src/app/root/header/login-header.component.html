@@ -1,0 +1,209 @@
+<nav class="navbar navbar-expand-lg navbar-light">
+  <div class="container justify-content-between">
+    <div>
+      <a class="navbar-brand text-white"
+         href="https://nacid.bg/bg/"
+         target="_blank">
+        <img src="../../../assets/img/nacid_logo_light.png"
+             width="40"
+             height="45"
+             class="d-inline-block align-text-top">
+        <div class="d-inline-block align-text-top ms-2">
+          <h5 class="nacid-text">{{ 'root.header.nacidShort' | translate }}</h5>
+          <h6>{{ 'root.header.rdpzsd' | translate }}</h6>
+        </div>
+      </a>
+    </div>
+
+    <div>
+      <button type="button"
+              class="navbar-toggler"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div id="navbarCollapse"
+           class="collapse navbar-collapse">
+        <ul class="nav navbar-nav nav-pills">
+          <li class="nav-item dropdown me-1">
+            <a href="#"
+               class="nav-link dropdown-toggle"
+               [class.nav-link-active]="rdpzsdLinkRef.isActive || rdpzsdGraduatedLinkRef.isActive"
+               data-bs-toggle="dropdown">
+              <i class="fas fa-graduation-cap"></i>
+              {{ 'root.header.register' | translate }}
+            </a>
+            <div class="dropdown-menu">
+              <a [routerLink]="['/rdpzsd']"
+                 class="dropdown-item"
+                 routerLinkActive
+                 #rdpzsdLinkRef="routerLinkActive">
+                {{ 'root.header.activeInterrupted' | translate }}
+              </a>
+              <a [routerLink]="['/rdpzsdGraduated']"
+                 routerLinkActive
+                 #rdpzsdGraduatedLinkRef="routerLinkActive"
+                 class="dropdown-item">
+                {{ 'root.header.graduated' | translate }}
+              </a>
+            </div>
+          </li>
+          <li class="nav-item dropdown me-1"
+              *ngIf="userDataService.isEmsEditUser()">
+            <a href="#"
+               class="nav-link dropdown-toggle"
+               [class.nav-link-active]="rdpzsdNewSearchLinkRef.isActive || rdpzsdApprovalLinkRef.isActive"
+               data-bs-toggle="dropdown">
+              <i class="fas fa-address-card"></i>
+              {{ 'root.header.naturalPersons' | translate }}
+            </a>
+            <div class="dropdown-menu">
+              <a [routerLink]="['/rdpzsdNewSearch']"
+                 routerLinkActive
+                 #rdpzsdNewSearchLinkRef="routerLinkActive"
+                 class="dropdown-item">{{ 'rdpzsd.search' | translate}}
+              </a>
+
+              <a [routerLink]="['/rdpzsdApproval']"
+                 routerLinkActive
+                 #rdpzsdApprovalLinkRef="routerLinkActive"
+                 class="dropdown-item">{{ 'root.header.forApproval' | translate}}
+              </a>
+            </div>
+          </li>
+          <a *ngIf="userDataService.isRsdUser()"
+             [routerLink]="['/rdpzsdNewSearch']"
+             [routerLinkActive]="['nav-link-active']"
+             class="nav-link fw-bold me-1">
+            <i class="fas fa-address-card"></i>
+            {{ 'root.header.naturalPersons' | translate }}
+          </a>
+          <a *ngIf="userDataService.isEmsStickersUser() 
+            || (userDataService.isRsdUser() && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster))"
+             [routerLink]="['/rdpzsdStickers']"
+             [routerLinkActive]="['nav-link-active']"
+             class="nav-link fw-bold me-1">
+            <i class="fas fa-ticket-alt"></i>
+            {{ 'root.header.stickers' | translate }}
+          </a>
+          <li class="nav-item dropdown me-1">
+            <a href="#"
+               class="nav-link dropdown-toggle"
+               [class.nav-link-active]="stickerReportsLinkRef != null && stickerReportsLinkRef.isActive"
+               data-bs-toggle="dropdown">
+              <i class="fas fa-signal"></i>
+              {{ 'root.header.report' | translate }}
+            </a>
+            <div class="dropdown-menu">
+              <a *ngIf="configuration.enableFullFunctionality && (userDataService.isEmsStickersUser() || userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)"
+                 [routerLink]="['/stickerReports']"
+                 routerLinkActive
+                 #stickerReportsLinkRef="routerLinkActive"
+                 class="dropdown-item">{{ 'root.header.stickerReport' | translate}}
+              </a>
+            </div>
+          </li>
+          <li *ngIf="configuration.enableFullFunctionality && (userDataService.isEmsEditUser() 
+              || (userDataService.isRsdUser() && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)))"
+              class="nav-item dropdown me-1">
+            <a href="#"
+               class="nav-link dropdown-toggle"
+               [class.nav-link-active]="personImportLinkRef.isActive || specialityImportLinkRef.isActive"
+               data-bs-toggle="dropdown">
+              <i class="fas fa-download"></i>
+              {{ 'root.header.rdpzsdImport' | translate }}
+            </a>
+            <div class="dropdown-menu">
+              <a [routerLink]="['/personImport']"
+                 routerLinkActive
+                 #personImportLinkRef="routerLinkActive"
+                 class="dropdown-item">
+                {{ 'rdpzsdImport.person.title' | translate}}
+              </a>
+              <a [routerLink]="['/specialityImport']"
+                 routerLinkActive
+                 #specialityImportLinkRef="routerLinkActive"
+                 class="dropdown-item">
+                {{ 'rdpzsdImport.speciality.title' | translate}}
+              </a>
+            </div>
+          </li>
+          <li class="nav-item dropdown me-1">
+            <a href="#"
+               class="nav-link dropdown-toggle"
+               [class.nav-link-active]="settlementLinkRef.isActive 
+                || institutionLinkRef.isActive 
+                || specialityLinkRef.isActive
+                || studentStatusLinkRef.isActive
+                || othersLinkRef.isActive"
+               data-bs-toggle="dropdown">
+              <i class="fas fa-wrench"></i>
+              {{ 'root.header.nomenclature' | translate }}
+            </a>
+            <div class="dropdown-menu">
+              <a [routerLink]="['/nomenclature/settlement']"
+                 routerLinkActive
+                 #settlementLinkRef="routerLinkActive"
+                 class="dropdown-item">{{ 'nomenclature.settlement.title' | translate}}
+              </a>
+              <a [routerLink]="['/nomenclature/institution']"
+                 routerLinkActive
+                 #institutionLinkRef="routerLinkActive"
+                 class="dropdown-item">{{ 'nomenclature.institution.title' | translate}}
+              </a>
+              <a [routerLink]="['/nomenclature/speciality']"
+                 routerLinkActive
+                 #specialityLinkRef="routerLinkActive"
+                 class="dropdown-item">{{ 'nomenclature.speciality.title' | translate}}
+              </a>
+              <a [routerLink]="['/nomenclature/studentStatus']"
+                 routerLinkActive
+                 #studentStatusLinkRef="routerLinkActive"
+                 class="dropdown-item">{{ 'nomenclature.studentStatusEvent.title' | translate}}
+              </a>
+              <a [routerLink]="['/nomenclature/others']"
+                 routerLinkActive
+                 #othersLinkRef="routerLinkActive"
+                 class="dropdown-item">{{ 'nomenclature.others.title' | translate}}
+              </a>
+            </div>
+          </li>
+          <li class="nav-item dropdown">
+            <a href="#"
+               data-bs-toggle="dropdown"
+               class="nav-link dropdown-toggle"
+               data-bs-display="static">
+              <i class="fas fa-question me-1"></i>{{ 'root.header.help' | translate}}</a>
+            <ul class="dropdown-menu">
+              <li>
+                <dropdown-submenu text="{{ 'root.header.userManuals' | translate }}">
+                  <a href="../../../assets/pdf/Работа със системата v.1.0.pdf"
+                     target="_blank"
+                     class="dropdown-item cursor-pointer">Работа със системата</a>
+                  <a href="../../../assets/pdf/Инструкция .txt файлове v.1.0.pdf"
+                     target="_blank"
+                     class="dropdown-item cursor-pointer">Работа с .txt файлове</a>
+                  <a href=".../../../assets/pdf/Инструкция номенклатури v.1.0.pdf"
+                     target="_blank"
+                     class="dropdown-item cursor-pointer">Номенклатури</a>
+                </dropdown-submenu>
+
+                <dropdown-submenu text="{{ 'root.header.specifications' | translate }}">
+                  <a href="../../../assets/pdf/Физически лица v.1.0.pdf"
+                     target="_blank"
+                     class="dropdown-item cursor-pointer">Физически лица</a>
+                  <a href="../../../assets/pdf/Информация за обучението v.1.0.pdf"
+                     target="_blank"
+                     class="dropdown-item cursor-pointer">Информация за обучението</a>
+                </dropdown-submenu>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- <language-button></language-button> -->
+</nav>

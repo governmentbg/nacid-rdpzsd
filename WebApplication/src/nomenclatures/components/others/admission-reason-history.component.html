@@ -1,0 +1,110 @@
+<div class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <strong class="ft-upper">{{ 'nomenclature.admissionReason.historyTitle' | translate }}</strong>
+  
+        <sync-button btnClass="btn btn-outline-primary btn-sm"
+                     text="root.buttons.close"
+                     [click]="close"
+                     [clickContext]="this">
+        </sync-button>
+      </div>
+    </div>
+  
+    <div class="card-body">
+      <ng-template ngFor
+                   let-historyItem
+                   [ngForOf]="admissionReasonHistories"
+                   let-i="index">
+        <collapsable-section [isCollapsed]="i !== 0"
+                             heading="{{historyItem.changeDate | date: 'dd.MM.yyyy hh:mm'}} - {{historyItem.userFullName}}">
+          <div body>
+            <div class="row g-4">
+              <div class="col-md-4">
+                <label class="form-label fs-14">{{ 'nomenclature.admissionReason.shortName' | translate }}</label>
+                <div class="input-group input-group-sm">
+                  <input type="text"
+                         class="form-control form-control-sm"
+                         value="{{historyItem.shortName}}"
+                         disabled />
+                </div>
+              </div>
+  
+              <div class="col-md-4">
+                <label class="form-label fs-14">{{ 'nomenclature.admissionReason.shortNameAlt' | translate }}</label>
+                <div class="input-group input-group-sm">
+                  <input type="text"
+                         class="form-control form-control-sm"
+                         value="{{historyItem.shortNameAlt}}"
+                         disabled />
+                </div>
+              </div>
+  
+              <div class="col-md-2">
+                <label class="form-label fs-14">{{ 'nomenclature.isActive' | translate }}</label>
+                <div class="input-group input-group-sm">
+                  <input type="text"
+                         class="form-control form-control-sm"
+                         value="{{historyItem.isActive ? 'Да' : 'Не'}}"
+                         disabled />
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-12">
+                <label class="form-label fs-14">{{ 'nomenclature.admissionReason.description' | translate }}</label>
+                <div class="input-group input-group-sm">
+                  <textarea class="form-control form-control-sm"
+                         value="{{historyItem.name}}"
+                         disabled>
+                  </textarea>
+                </div>
+              </div>
+            </div>
+  
+            <div class="row g-3">
+              <div class="col-md-12">
+                <label class="form-label fs-14">{{ 'nomenclature.admissionReason.name' | translate }}</label>
+                <div class="input-group input-group-sm">
+                  <input type="text"
+                         class="form-control form-control-sm"
+                         value="{{historyItem.name}}"
+                         disabled />
+                </div>
+              </div>
+
+              <div class="col-md-12">
+                <label class="form-label fs-14">{{ 'nomenclature.admissionReason.nameAlt' | translate }}</label>
+                <div class="input-group input-group-sm">
+                  <input type="text"
+                         class="form-control form-control-sm"
+                         value="{{historyItem.nameAlt}}"
+                         disabled />
+                </div>
+              </div>
+  
+            </div>
+  
+           <table class="table table-bordered">
+             <thead class="table-light">
+               <tr>
+                 <th class="col-12">{{ 'nomenclature.educationFeeType.title' | translate }}</th>
+               </tr>
+             </thead>
+             <tbody>
+               <ng-container
+                             *ngIf="historyItem.admissionReasonEducationFeeHistories && historyItem.admissionReasonEducationFeeHistories.length > 0;">
+                 <tr *ngFor="let admissionReasonEducationFeeHistory of historyItem.admissionReasonEducationFeeHistories; let i = index">
+                   <td>
+                     {{ admissionReasonEducationFeeHistory.educationFeeTypeName }}
+                   </td>
+                 </tr>
+               </ng-container>
+             </tbody>
+           </table>
+          </div>
+        </collapsable-section>
+      </ng-template>
+    </div>
+  </div>

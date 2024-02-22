@@ -1,0 +1,22 @@
+<div *ngIf="studentStatus && studentEvent">
+  <strong>{{ 'nomenclature.studentStatus.currentStatus' | translate }}:</strong>
+  <span *ngIf="studentCourse && studentSemester && studentStatus?.alias !== studentStatusGraduated"
+        class="ms-1">
+    {{ 'rdpzsd.personStudent.courseShort' | translate }} {{ 'enums.courseType.' + courseType[studentCourse] +
+    'Number' | translate }}, сем. {{ 'enums.semester.' + semesterType[studentSemester] + 'Short' |
+    translate }};
+  </span>
+
+  <span [ngClass]="{'text-red': studentStatus?.alias === studentStatusInterrupted, 'text-green': studentStatus?.alias === studentStatusActive,
+                     'text-black': studentStatus?.alias !== studentStatusActive && studentStatus?.alias !== studentStatusInterrupted}"
+        class="ms-1">
+    {{ studentStatus.name }}
+  </span>
+
+  <span *ngIf="studentEvent?.alias !== studentEventGraduatedWithDiploma"
+        class="ms-1">
+    ({{ studentEvent.name }}<span
+          *ngIf="period?.year && period?.semester && studentStatus?.alias !== studentStatusGraduated"> -
+      {{period?.year}}/{{period?.semester}}</span>)
+  </span>
+</div>

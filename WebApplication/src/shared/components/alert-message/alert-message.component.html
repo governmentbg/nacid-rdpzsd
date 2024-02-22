@@ -1,0 +1,13 @@
+<ng-container *ngFor="let alertMessage of alertMessages">
+  <div class="container">
+    <div class="alert alert-{{alertMessage.type}} alert-dismissible"
+         role="alert">
+      <span [innerHTML]="alertMessage.domainErrorCode | translate"></span>
+      <span *ngIf="alertMessage.errorText" [ngClass]="{'fw-bold': alertMessage.domainErrorCode === 'errorTexts.personSecondary_NotFoundSecondaryByUin'}">
+        {{alertMessage.errorText}}</span>
+      <span (click)="removeMessage(alertMessage)"
+            type="button"
+            class="btn-close no-border"></span>
+    </div>
+  </div>
+</ng-container>

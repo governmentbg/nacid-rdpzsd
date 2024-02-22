@@ -1,0 +1,24 @@
+<div class="container">
+    <nav ngbNav
+         #nav="ngbNav"
+         [(activeId)]="activeTab"
+         class="nav-tabs">
+        <ng-container *ngIf="userDataService.isEmsUser() || userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster"
+                      ngbNavItem="Students">
+            <a ngbNavLink>{{ 'enums.personSearchFilterType.student' | translate }}</a>
+            <ng-template ngbNavContent>
+                <rdpzsd-search-students [isGraduated]="false"></rdpzsd-search-students>
+            </ng-template>
+        </ng-container>
+        <ng-container *ngIf="userDataService.isEmsUser() || userDataService.userData?.institution?.hasDoctoral"
+                      ngbNavItem="Doctorals">
+            <a ngbNavLink>{{ 'enums.personSearchFilterType.doctoral' | translate }}</a>
+            <ng-template ngbNavContent>
+                <rdpzsd-search-doctorals [isGraduated]="false"></rdpzsd-search-doctorals>
+            </ng-template>
+        </ng-container>
+    </nav>
+
+    <div [ngbNavOutlet]="nav"
+         class="mt-2"></div>
+</div>

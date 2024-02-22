@@ -1,0 +1,30 @@
+<div class="bool-select-container"
+     [class.cursor-pointer]="!disabled">
+  <!-- selected item and buttons -->
+  <div class="d-flex {{formControlClass}}"
+       [class.disabled-select]="disabled">
+    <div class="d-flex w-100 justify-content-between">
+      <span *ngIf="!model && model !== false">{{ items[2].name | translate }}</span>
+      <span *ngIf="model === false">{{ items[1].name | translate }}</span>
+      <span *ngIf="model === true">{{ items[0].name | translate }}</span>
+
+      <div *ngIf="!disabled">
+        <span class="{{ selectOpened ? 'fa fa-chevron-up' : 'fa fa-chevron-down' }}"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- search -->
+  <div *ngIf="selectOpened"
+       class="search-box-container">
+    <div *ngIf="selectOpened"
+         class="d-flex {{formControlClass}} options-container border-top-0 flex-column"
+         [class.disabled-select]="disabled">
+      <div *ngFor="let item of items"
+           class="options-item"
+           (click)="selectOption(item.value, $event)">
+        <span>{{ item.name | translate }}</span>
+      </div>
+    </div>
+  </div>
+</div>

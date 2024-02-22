@@ -1,0 +1,262 @@
+<nav ngbNav
+     #nav="ngbNav"
+     [(activeId)]="activeTab"
+     class="nav-tabs mb-3 mt-4">
+    <ng-container ngbNavItem="BirthPlace">
+        <a ngbNavLink>{{ 'rdpzsd.personBasic.birthPlace' | translate }}</a>
+        <ng-template ngbNavContent>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fs-14">{{ 'nomenclature.country.name' | translate }}</label>
+                    <invalid-field [element]="birthCountry"
+                                   text="invalidFields.required"></invalid-field>
+                    <nomenclature-select restUrl="Nomenclature/Country"
+                                         name="birthCountry"
+                                         #birthCountry="ngModel"
+                                         [(ngModel)]="personBasic.birthCountry"
+                                         (ngModelChange)="settlementChangeService.countryChange(personBasic, $event, 'birthCountry', 'birthDistrict', 'birthMunicipality', 'birthSettlement')"
+                                         textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                         [disabled]="!isEditMode"
+                                         [required]="true">
+                    </nomenclature-select>
+                </div>
+
+                <div *ngIf="personBasic.birthCountry && personBasic.birthCountry.code === 'BG'"
+                     class="col-md-3">
+                    <label class="form-label fs-14">{{ 'nomenclature.settlement.name' | translate }}</label>
+                    <invalid-field [element]="birthSettlement"
+                                   text="invalidFields.required"></invalid-field>
+                    <nomenclature-select restUrl="Nomenclature/Settlement"
+                                         name="birthSettlement"
+                                         #birthSettlement="ngModel"
+                                         [(ngModel)]="personBasic.birthSettlement"
+                                         (click)="birthSettlementClicked()"
+                                         (ngModelChange)="settlementChangeService.settlementChange(personBasic, $event, 'birthSettlement', 'birthDistrict', 'birthMunicipality')"
+                                         [filter]="{districtId: personBasic.birthDistrictId, municipalityId: personBasic.birthMunicipalityId}"
+                                         textTemplate="{{translateService.currentLang === 'bg' ? '{name}, обл. {district.name}, общ. {municipality.name}' : '{nameAlt}, {district.nameAlt}, {municipality.nameAlt}'}}"
+                                         [disabled]="!isEditMode"
+                                         [required]="true">
+                    </nomenclature-select>
+
+                </div>
+
+                <div *ngIf="personBasic.birthCountry && personBasic.birthCountry.code === 'BG'"
+                     class="col-md-3">
+                    <label class="form-label fs-14">{{ 'nomenclature.district.name' | translate }}</label>
+                    <invalid-field [element]="birthDistrict"
+                                    text="invalidFields.required"></invalid-field>
+                    <nomenclature-select restUrl="Nomenclature/District"
+                                         name="birthDistrict"
+                                         #birthDistrict="ngModel"
+                                         [required]="true"
+                                         [(ngModel)]="personBasic.birthDistrict"
+                                         (ngModelChange)="settlementChangeService.districtChange(personBasic, $event, 'birthDistrict')"
+                                         textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                         [disabled]="!isEditMode">
+                    </nomenclature-select>
+                </div>
+
+                <div *ngIf="personBasic.birthCountry && personBasic.birthCountry.code === 'BG'"
+                     class="col-md-3">
+                    <label class="form-label fs-14">{{ 'nomenclature.municipality.name' | translate }}</label>
+                    <invalid-field [element]="birthMunicipality"
+                                    text="invalidFields.required"></invalid-field>
+                    <nomenclature-select restUrl="Nomenclature/Municipality"
+                                         name="birthMunicipality"
+                                         #birthMunicipality="ngModel"
+                                         [required]="true"
+                                         [(ngModel)]="personBasic.birthMunicipality"
+                                         (ngModelChange)="settlementChangeService.municipalityChange(personBasic, $event, 'birthMunicipality')"
+                                         [filter]="{districtId: personBasic.birthDistrictId}"
+                                         textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                         [disabled]="!isEditMode">
+                    </nomenclature-select>
+                </div>
+
+                <div *ngIf="personBasic.birthCountry && personBasic.birthCountry.code !== 'BG'"
+                     class="col-md-9">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personBasic.foreignerBirthSettlement' | translate
+                        }}</label>
+                    <invalid-field [element]="foreignerBirthSettlement"
+                                   text="invalidFields.cyrillicRequired"></invalid-field>
+                    <input type="text"
+                           class="form-control form-control-sm form-control-invalid"
+                           [(ngModel)]="personBasic.foreignerBirthSettlement"
+                           name="foreignerBirthSettlement"
+                           #foreignerBirthSettlement="ngModel"
+                           [disabled]="!isEditMode"
+                           customRegexValidation
+                           maxlength="50"
+                           minlength="3"
+                           patternName="foreignerBirthSettlement"
+                           noWhiteSpacesValidation />
+                </div>
+            </div>
+        </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="Citizenship">
+        <a ngbNavLink>{{ 'rdpzsd.personBasic.citizenships' | translate }}</a>
+        <ng-template ngbNavContent>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personBasic.citizenship' | translate }}</label>
+                    <invalid-field [element]="citizenship"
+                                   text="invalidFields.required"></invalid-field>
+                    <nomenclature-select restUrl="Nomenclature/Country"
+                                         name="citizenship"
+                                         #citizenship="ngModel"
+                                         [includeInactive]="true"
+                                         [allowClear]="false"
+                                         [filter]="{ excludeCode: 'MISSING' }"
+                                         [(ngModel)]="personBasic.citizenship"
+                                         (keyPropertyChange)="personBasic.citizenshipId = $event"
+                                         textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                         [disabled]="!isEditMode"
+                                         [required]="true">
+                    </nomenclature-select>
+                </div>
+
+                <div *ngIf="personBasic.secondCitizenship || isEditMode"
+                     class="col-md-3">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personBasic.secondCitizenship' | translate }}</label>
+                    <invalid-field [element]="secondCitizenship"
+                                   text="invalidFields.invalidCitizenship"></invalid-field>
+                    <nomenclature-select restUrl="Nomenclature/Country"
+                                         name="secondCitizenship"
+                                         #secondCitizenship="ngModel"
+                                         citizenshipValidation
+                                         [otherCitizenshipId]="personBasic.citizenshipId"
+                                         [(ngModel)]="personBasic.secondCitizenship"
+                                         [formControlClass]="secondCitizenship.value !== null && secondCitizenship.invalid ? 'form-control form-control-sm form-control-invalid-nomenclature' : 'form-control form-control-sm'"
+                                         (keyPropertyChange)="personBasic.secondCitizenshipId = $event"
+                                         textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                         [disabled]="!isEditMode">
+                    </nomenclature-select>
+                </div>
+            </div>
+        </ng-template>
+    </ng-container>
+    <ng-container ngbNavItem="Residence">
+        <a ngbNavLink>{{ 'rdpzsd.personBasic.residence' | translate }}</a>
+        <ng-template ngbNavContent>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fs-14">{{ 'nomenclature.country.name' | translate }}</label>
+                    <invalid-field [element]="residenceCountry"
+                                   text="invalidFields.required"></invalid-field>
+                    <nomenclature-select restUrl="Nomenclature/Country"
+                                         name="residenceCountry"
+                                         #residenceCountry="ngModel"
+                                         [(ngModel)]="personBasic.residenceCountry"
+                                         (ngModelChange)="settlementChangeService.countryChange(personBasic, $event, 'residenceCountry', 'residenceDistrict', 'residenceMunicipality', 'residenceSettlement')"
+                                         textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                         [disabled]="!isEditMode"
+                                         [required]="true">
+                    </nomenclature-select>
+                </div>
+
+                <div *ngIf="personBasic.residenceCountry && personBasic.residenceCountry.code === 'BG'"
+                     class="col-md-3">
+                    <label class="form-label fs-14">{{ 'nomenclature.settlement.name' | translate }}</label>
+                    <invalid-field [element]="residenceSettlement"
+                                   text="invalidFields.required"></invalid-field>
+                    <nomenclature-select restUrl="Nomenclature/Settlement"
+                                         name="residenceSettlement"
+                                         #residenceSettlement="ngModel"
+                                         [(ngModel)]="personBasic.residenceSettlement"
+                                         (ngModelChange)="settlementChangeService.settlementChange(personBasic, $event, 'residenceSettlement', 'residenceDistrict', 'residenceMunicipality')"
+                                         [filter]="{districtId: personBasic.residenceDistrictId, municipalityId: personBasic.residenceMunicipalityId}"
+                                         textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                         [disabled]="!isEditMode"
+                                         [required]="true">
+                    </nomenclature-select>
+                </div>
+
+                <div *ngIf="personBasic.residenceCountry && personBasic.residenceCountry.code === 'BG'"
+                     class="col-md-3">
+                    <label class="form-label fs-14">{{ 'nomenclature.district.name' | translate }}</label>
+                    <invalid-field [element]="residenceDistrict"
+                                    text="invalidFields.required"></invalid-field>
+                    <nomenclature-select restUrl="Nomenclature/District"
+                                         name="residenceDistrict"
+                                         #residenceDistrict="ngModel"
+                                         [required]="true"
+                                         [(ngModel)]="personBasic.residenceDistrict"
+                                         (ngModelChange)="settlementChangeService.districtChange(personBasic, $event, 'residenceDistrict')"
+                                         textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                         [disabled]="!isEditMode">
+                    </nomenclature-select>
+                </div>
+
+                <div *ngIf="personBasic.residenceCountry && personBasic.residenceCountry.code === 'BG'"
+                     class="col-md-3">
+                    <label class="form-label fs-14">{{ 'nomenclature.municipality.name' | translate }}</label>
+                    <invalid-field [element]="residenceMunicipality"
+                                   text="invalidFields.required"></invalid-field>
+                    <nomenclature-select restUrl="Nomenclature/Municipality"
+                                         name="residenceMunicipality"
+                                         #residenceMunicipality="ngModel"
+                                         [required]="true"
+                                         [(ngModel)]="personBasic.residenceMunicipality"
+                                         (ngModelChange)="settlementChangeService.municipalityChange(personBasic, $event, 'residenceMunicipality')"
+                                         [filter]="{districtId: personBasic.residenceDistrictId}"
+                                         textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                         [disabled]="!isEditMode">
+                    </nomenclature-select>
+                </div>
+
+                <div *ngIf="personBasic.residenceCountry && personBasic.residenceCountry.code === 'BG'"
+                     class="col-md-1">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personBasic.postCode' | translate }}</label>
+                    <input type="text"
+                           class="form-control form-control-sm form-control-invalid"
+                           [(ngModel)]="personBasic.postCode"
+                           name="postCode"
+                           #postCode="ngModel"
+                           [disabled]="!isEditMode"
+                           maxlength="4"
+                           minlength="4"
+                           [enableEmptyValidation]="true"
+                           numbersOnly />
+                </div>
+
+                <div *ngIf="personBasic.residenceCountry && personBasic.residenceCountry.code === 'BG'"
+                     class="col-md-11">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personBasic.residenceAddress' | translate }}</label>
+                    <input type="text"
+                           class="form-control form-control-sm form-control-invalid"
+                           [(ngModel)]="personBasic.residenceAddress"
+                           name="residenceAddress"
+                           [disabled]="!isEditMode"
+                           #residenceAdress="ngModel"
+                           customRegexValidation
+                           maxlength="255"
+                           minlength="8"
+                           [enableEmptyValidation]="true"
+                           patternName="residenceAddressCyrillic" />
+                </div>
+
+                <div *ngIf="personBasic.residenceCountry && personBasic.residenceCountry.code !== 'BG'"
+                     class="col-md-9">
+                    <label class="form-label fs-14">{{ 'rdpzsd.personBasic.residenceAddressForeigner' | translate}}
+                        {{ 'rdpzsd.personBasic.latin' | translate }}</label>
+                    <input type="text"
+                           class="form-control form-control-sm form-control-invalid"
+                           [(ngModel)]="personBasic.residenceAddress"
+                           name="residenceAddressForeigner"
+                           [disabled]="!isEditMode"
+                           #residenceAddressForeigner="ngModel"
+                           customRegexValidation
+                           maxlength="255"
+                           minlength="8"
+                           [enableEmptyValidation]="true"
+                           patternName="residenceAddressLatin"/>
+                </div>
+            </div>
+        </ng-template>
+    </ng-container>
+</nav>
+
+<div [ngbNavOutlet]="nav"
+     class="mt-2">
+</div>

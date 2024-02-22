@@ -1,0 +1,25 @@
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <strong class="ft-upper">{{ 'rdpzsd.personStudent.historyTitle' | translate }}</strong>
+
+            <sync-button btnClass="btn btn-outline-primary btn-sm"
+                         text="root.buttons.close"
+                         [click]="close"
+                         [clickContext]="this">
+            </sync-button>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <person-student-history-data [personStudent]="personStudentHistoryDto.actual"
+                                     [isCollapsed]="false"></person-student-history-data>
+
+        <ng-template ngFor
+                     let-historyItem
+                     [ngForOf]="personStudentHistoryDto.histories"
+                     let-i="index">
+            <person-student-history-data [personStudent]="historyItem"></person-student-history-data>
+        </ng-template>
+    </div>
+</div>

@@ -1,0 +1,158 @@
+<div class="d-flex justify-content-between">
+    <strong class="form-label fs-14 text-blue mt-2">{{ 'rdpzsd.personStudent.diploma.title' | translate }}</strong>
+    <sync-button *ngIf="!currentPersonContextService.isInEdit
+                        && configuration.enableFullFunctionality
+                        && personLotState === lotState.actual
+                        && partState === partStateType.actual
+                        && studentEventAlias === studentEventGraduatedWithoutDiploma
+                        && diploma === null
+                        && userDataService.isRsdUser() 
+                        && institutionId === userDataService.userData.institution.id 
+                        && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)"
+                 btnClass="btn btn-primary btn-sm mb-2"
+                 text="root.buttons.addDiploma"
+                 [click]="addDiploma"
+                 [clickContext]="this">
+    </sync-button>
+</div>
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr>
+            <th class="col-2">{{ 'rdpzsd.personStudent.diploma.number' | translate }}</th>
+            <th class="col-2">{{ 'rdpzsd.personStudent.diploma.registrationNumber' | translate }}</th>
+            <th class="col-2">{{ 'rdpzsd.personStudent.diploma.date' | translate }}</th>
+            <th class="col-4">{{ 'rdpzsd.personStudent.diploma.file' | translate }}</th>
+            <th class="col-2">{{ 'root.results.actions' | translate }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-container *ngIf="diploma !== null; else noDiploma">
+            <tr>
+                <ng-container *ngIf="isEditMode">
+                    <td colspan="5">
+                        <form #form="ngForm"
+                              autocomplete="off">
+                            <div class="row g-3">
+                                <div class="col-md-2">
+                                    <input type="text"
+                                           class="form-control form-control-sm form-control-invalid"
+                                           [(ngModel)]="diploma.diplomaNumber"
+                                           name="diplomaNumber"
+                                           maxlength="25"
+                                           noWhiteSpacesValidation />
+                                </div>
+
+                                <div class="col-md-2">
+                                    <input type="text"
+                                           class="form-control form-control-sm form-control-invalid"
+                                           [(ngModel)]="diploma.registrationDiplomaNumber"
+                                           name="registrationDiplomaNumber"
+                                           maxlength="25"
+                                           noWhiteSpacesValidation />
+                                </div>
+
+                                <div class="col-md-2">
+                                    <date-time [(ngModel)]="diploma.diplomaDate"
+                                               name="diplomaDate"
+                                               [required]="true"
+                                               [useEndYear]="true"></date-time>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <file-upload name="file"
+                                                 [(ngModel)]="diploma.file"
+                                                 [required]="true"
+                                                 [disabled]="!configuration.enableFullFunctionality"></file-upload>
+                                </div>
+
+                                <div class="d-flex justify-content-center col-md-2">
+                                    <sync-button btnClass="btn btn-success btn-sm ms-2"
+                                                 icon="fas fa-save"
+                                                 titleText="{{ 'root.buttons.save' | translate }}"
+                                                 [disabled]="form.invalid"
+                                                 [click]="save"
+                                                 [clickContext]="this">
+                                    </sync-button>
+
+                                    <sync-button btnClass="btn btn-danger btn-sm ms-2"
+                                                 icon="fas fa-times"
+                                                 titleText="{{ 'root.buttons.cancel' | translate }}"
+                                                 [click]="cancel"
+                                                 [clickContext]="this">
+                                    </sync-button>
+                                </div>
+                            </div>
+                        </form>
+                    </td>
+                </ng-container>
+                <ng-container *ngIf="!isEditMode">
+                    <td>{{ diploma.diplomaNumber }}</td>
+                    <td>{{ diploma.registrationDiplomaNumber }}</td>
+                    <td>{{ diploma.diplomaDate | date: 'dd.MM.yyyy' }}</td>
+                    <td>
+                        <div *ngIf="userDataService.isEmsUser() || (userDataService.isRsdUser() 
+                                && institutionId === userDataService.userData.institution.id); else noPermissions">
+                            <a *ngIf="diploma?.file?.key"
+                               [routerLink]=""
+                               class="cursor-pointer"
+                               (click)="downloadFile()">
+                                {{ diploma?.file?.name }}
+                            </a>
+                        </div>
+
+                        <ng-template #noPermissions>
+                            <i>{{ 'root.results.noAccess' | translate }}</i>
+                        </ng-template>
+                    </td>
+                    <td class="center-text-td">
+                        <sync-button *ngIf="!currentPersonContextService.isInEdit
+                                && configuration.enableFullFunctionality
+                                && diploma?.id
+                                && diploma?.isValid
+                                && personLotState === lotState.actual
+                                && partState === partStateType.actual
+                                && studentEventAlias === studentEventGraduatedWithDiploma
+                                && userDataService.isRsdUser() 
+                                && institutionId === userDataService.userData.institution.id 
+                                && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)"
+                                     btnClass="btn btn-primary btn-sm ms-2"
+                                     titleText="Редакция"
+                                     icon="fas fa-pen"
+                                     [click]="edit"
+                                     [clickContext]="this">
+                        </sync-button>
+
+                        <sync-button *ngIf="!currentPersonContextService.isInEdit
+                                && configuration.enableFullFunctionality
+                                && diploma?.id
+                                && diploma?.isValid
+                                && personLotState === lotState.actual
+                                && partState === partStateType.actual
+                                && studentEventAlias === studentEventGraduatedWithDiploma
+                                && userDataService.isRsdUser() 
+                                && institutionId === userDataService.userData.institution.id 
+                                && (userDataService.userData?.institution?.hasBachelor || userDataService.userData?.institution?.hasMaster)"
+                                     btnClass="btn btn-danger btn-sm ms-2"
+                                     text="rdpzsd.personStudent.diploma.invalid"
+                                     [click]="invalid"
+                                     [clickContext]="this">
+                        </sync-button>
+
+                        <span *ngIf="diploma?.id && !diploma.isValid"
+                              class="text-red">
+                            {{ 'rdpzsd.personStudent.diploma.invalid' | translate }}
+                        </span>
+                    </td>
+                </ng-container>
+            </tr>
+        </ng-container>
+        <ng-template #noDiploma>
+            <tr>
+                <td colspan="5"
+                    class="col-12">
+                    <i>{{ 'rdpzsd.personDiploma.noDiploma' | translate }}</i>
+                </td>
+            </tr>
+        </ng-template>
+    </tbody>
+</table>

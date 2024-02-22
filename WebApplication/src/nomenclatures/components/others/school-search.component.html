@@ -1,0 +1,159 @@
+<div class="card no-border shadow mt-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="name"
+                       class="form-label fs-14">{{ 'nomenclature.name' | translate }}</label>
+                <input type="text"
+                       class="form-control form-control-sm"
+                       [(ngModel)]="filter.name"
+                       id="name"
+                       name="name">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'nomenclature.school.type' | translate }}</label>
+                <enum-select [(ngModel)]="filter.type"
+                             enumName="schoolType"
+                             [enumType]="schoolType"></enum-select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'nomenclature.school.ownershipType' | translate }}</label>
+                <enum-select [(ngModel)]="filter.ownershipType"
+                             enumName="schoolOwnershipType"
+                             [enumType]="schoolOwnershipType"></enum-select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'nomenclature.school.state' | translate }}</label>
+                <enum-select [(ngModel)]="filter.state"
+                             enumName="schoolState"
+                             [enumType]="schoolState"></enum-select>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label fs-14">{{ 'nomenclature.district.name' | translate }}</label>
+                <nomenclature-select restUrl="Nomenclature/District"
+                                     [(ngModel)]="filter.district"
+                                     (ngModelChange)="settlementChangeService.districtChange(filter, $event, 'district', 'municipality', 'settlement')"
+                                     textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                </nomenclature-select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fs-14">{{ 'nomenclature.municipality.name' | translate }}</label>
+                <nomenclature-select restUrl="Nomenclature/Municipality"
+                                     [(ngModel)]="filter.municipality"
+                                     (ngModelChange)="settlementChangeService.municipalityChange(filter, $event, 'municipality', 'district', 'settlement')"
+                                     [filter]="{districtId: filter.districtId}"
+                                     textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                </nomenclature-select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fs-14">{{ 'nomenclature.settlement.name' | translate }}</label>
+                <nomenclature-select restUrl="Nomenclature/Settlement"
+                                     [(ngModel)]="filter.settlement"
+                                     (ngModelChange)="settlementChangeService.settlementChange(filter, $event, 'settlement', 'district', 'municipality')"
+                                     [filter]="{districtId: filter.districtId, municipalityId: filter.municipalityId}"
+                                     textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                </nomenclature-select>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <div class="btn-group">
+                <sync-button btnClass="btn btn-outline-success btn-sm"
+                             text="root.buttons.excel"
+                             [click]="exportExcel"
+                             [clickContext]="this"
+                             icon="fas fa-download">
+                </sync-button>
+            </div>
+            <div class="btn-group">
+                <sync-button *ngIf="userDataService.isEmsEditUser()"
+                                 btnClass="btn btn-primary btn-sm"
+                                 icon="fas fa-plus fa-sm"
+                                 text="root.buttons.add"
+                                 [click]="add"
+                                 [clickContext]="this">
+                </sync-button>
+
+                <sync-button btnClass="btn btn-primary btn-sm ms-3"
+                             text="root.buttons.search"
+                             [click]="getData"
+                             [clickParams]="[false]"
+                             [clickContext]="this"
+                             icon="fas fa-search">
+                </sync-button>
+
+                <sync-button btnClass="btn btn-outline-primary btn-sm ms-3"
+                             text="root.buttons.clear"
+                             [click]="clear"
+                             [clickContext]="this"
+                             icon="fas fa-trash">
+                </sync-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-scrollable">
+    <table class="table table-bordered mt-4">
+        <thead class="table-light">
+            <tr>
+                <th class="col-1">{{ 'nomenclature.school.number' | translate }}</th>
+                <th class="col-3">{{ 'nomenclature.name' | translate }}</th>
+                <th class="col-2">{{ 'nomenclature.school.type' | translate }}</th>
+                <th class="col-2">{{ 'nomenclature.school.ownershipType' | translate }}</th>
+                <th class="col-2">{{ 'nomenclature.school.state' | translate }}</th>
+                <th class="col-2">{{ 'nomenclature.settlement.name' | translate }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngIf="!loadingData; else loadingSection">
+                <ng-container *ngIf="searchResult.result && searchResult.result.length > 0; else noResults">
+                    <tr *ngFor="let school of searchResult.result">
+                        <td>{{ school.id }}</td>
+                        <td>{{ school.name }}</td>
+                        <td>{{ 'enums.schoolType.' + schoolType[school.type] | translate }}</td>
+                        <td>
+                            {{ 'enums.schoolOwnershipType.' + schoolOwnershipType[school.ownershipType] | translate }}
+                        </td>
+                        <td>{{ 'enums.schoolState.' + schoolState[school.state] | translate }}</td>
+                        <td>{{ school.settlement.name }}</td>
+                    </tr>
+                </ng-container>
+                <ng-template #noResults>
+                    <tr>
+                        <td colspan="6"
+                            class="col-12">
+                            <i>{{ 'root.results.noResults' | translate }}</i>
+                        </td>
+                    </tr>
+                </ng-template>
+            </ng-container>
+            <ng-template #loadingSection>
+                <tr>
+                    <td colspan="6"
+                        class="col-12">
+                        <loading-section></loading-section>
+                    </td>
+                </tr>
+            </ng-template>
+        </tbody>
+    </table>
+</div>
+
+<ngb-pagination *ngIf="searchResult.totalCount"
+                class="d-flex justify-content-end"
+                [collectionSize]="searchResult.totalCount"
+                [(page)]="filter.currentPage"
+                [pageSize]="filter.limit"
+                (pageChange)="getData()"
+                [maxSize]="3"
+                [rotate]="true"
+                [boundaryLinks]="true"></ngb-pagination>

@@ -1,0 +1,22 @@
+<div class="container">
+    <nav ngbNav
+         #nav="ngbNav"
+         [(activeId)]="activeTab"
+         class="nav-tabs">
+         <ng-container ngbNavItem="StudentStatus">
+             <a ngbNavLink>{{ 'nomenclature.studentStatus.title' | translate }}</a>
+                <ng-template ngbNavContent>
+                    <student-status-search></student-status-search>
+                </ng-template>
+         </ng-container>
+         <ng-container ngbNavItem="StudentEvent">
+            <a ngbNavLink>{{ 'nomenclature.studentEvent.title' | translate }}</a>
+               <ng-template ngbNavContent>
+                    <student-event-search></student-event-search>
+               </ng-template>
+         </ng-container>
+    </nav>
+
+    <div [ngbNavOutlet]="nav"
+         class="mt-2"></div>
+</div>

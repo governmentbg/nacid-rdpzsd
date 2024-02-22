@@ -1,0 +1,397 @@
+<div class="card no-border shadow mt-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-1">
+                <label for="uan"
+                       class="form-label fs-14">{{ 'rdpzsd.personLot.uanShort' | translate }}</label>
+                <input type="text"
+                       class="form-control form-control-sm"
+                       [(ngModel)]="filter.uan"
+                       id="uan"
+                       (ngModelChange)="filter.uan = $event.toUpperCase();"
+                       uanValidation
+                       maxlength="7"
+                       minlength="7"
+                       name="uan">
+            </div>
+
+            <div class="col-md-2">
+                <label for="uin"
+                       class="form-label fs-14">{{ 'rdpzsd.personBasic.uin' | translate }}</label>
+                <input type="text"
+                       class="form-control form-control-sm"
+                       [(ngModel)]="filter.uin"
+                       id="uin"
+                       numbersOnly
+                       uinValidation
+                       maxlength="10"
+                       minlength="10"
+                       name="uin">
+            </div>
+
+            <div class="col-md-2">
+                <label for="foreignerNumber"
+                       class="form-label fs-14">{{ 'rdpzsd.personBasic.foreignerNumber' | translate }}</label>
+                <input type="text"
+                       class="form-control form-control-sm"
+                       [(ngModel)]="filter.foreignerNumber"
+                       id="foreignerNumber"
+                       numbersOnly
+                       foreignerNumberValidation
+                       maxlength="10"
+                       minlength="10"
+                       name="foreignerNumber">
+            </div>
+
+            <div class="col-md-2">
+                <label for="idn"
+                       class="form-label fs-14">{{ 'rdpzsd.personBasic.idn' | translate }}</label>
+                <input type="text"
+                       class="form-control form-control-sm"
+                       [(ngModel)]="filter.idn"
+                       id="idn"
+                       maxlength="25"
+                       minlength="6"
+                       name="idn">
+            </div>
+
+            <div class="col-md-3">
+                <label for="fullName"
+                       class="form-label fs-14">{{ 'rdpzsd.personBasic.fullName' | translate }}</label>
+                <i class="fas fa-info-circle text-blue align-text-bottom ms-1"
+                   ngbTooltip="{{ 'rdpzsd.searchMenu.nameSearchInfo' | translate }}"
+                   tooltipClass="primary-tooltip"></i>
+                <input type="text"
+                       class="form-control form-control-sm"
+                       [(ngModel)]="filter.fullName"
+                       id="fullName"
+                       maxlength="100"
+                       minlength="2"
+                       name="fullName">
+            </div>
+
+            <div class="col-md-2">
+                <label for="email"
+                       class="form-label fs-14">{{ 'rdpzsd.personBasic.email' | translate }}</label>
+                <input type="text"
+                       class="form-control form-control-sm"
+                       [(ngModel)]="filter.email"
+                       id="email"
+                       maxlength="50"
+                       minlength="8"
+                       name="email">
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'rdpzsd.searchMenu.birthCountry' | translate }}</label>
+                <nomenclature-select restUrl="Nomenclature/Country"
+                                     name="birthCountry"
+                                     [(ngModel)]="filter.birthCountry"
+                                     (keyPropertyChange)="filter.birthCountryId = $event"
+                                     textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                </nomenclature-select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'rdpzsd.personBasic.citizenship' | translate }}</label>
+                <nomenclature-select restUrl="Nomenclature/Country"
+                                     name="citizenship"
+                                     [(ngModel)]="filter.citizenship"
+                                     (keyPropertyChange)="filter.citizenshipId = $event"
+                                     textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                </nomenclature-select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fs-14">{{ 'nomenclature.speciality.titleSingular' | translate }}</label>
+                <nomenclature-select restUrl="Nomenclature/InstitutionSpeciality"
+                                     [(ngModel)]="filter.institutionSpeciality"
+                                     (ngModelChange)="institutionSpecialityChanged($event)"
+                                     [filter]="{getInstitutionSpecialitiesByPermissions: true}"
+                                     textTemplate="{speciality.code} {speciality.name} - {speciality.educationalQualification.name} - {educationalForm.name} - {duration} год."
+                                     name="institutionSpeciality">
+                </nomenclature-select>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'nomenclature.institution.title' | translate }}</label>
+                <nomenclature-select restUrl="Nomenclature/Institution"
+                                     [(ngModel)]="filter.institution"
+                                     (keyPropertyChange)="filter.institutionId = $event"
+                                     [filter]="{level: level.first, getInstitutionsByPermissions: true}"
+                                     textTemplate="{{translateService.currentLang === 'bg' ? '{shortName}' : '{shortNameAlt}'}}"
+                                     [disabled]="userDataService.isRsdUser()">
+                </nomenclature-select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label fs-14">{{ 'nomenclature.educationalQualification.OKS' | translate }}</label>
+                <nomenclature-select restUrl="Nomenclature/EducationalQualification"
+                                     name="educationalQualification"
+                                     [showSearchBox]="false"
+                                     [(ngModel)]="filter.educationalQualification"
+                                     (keyPropertyChange)="filter.educationalQualificationId = $event"
+                                     [filter]="{alias: doctor, excludeAlias: true}"
+                                     [disabled]="filter.institutionSpecialityId > 0"
+                                     textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                </nomenclature-select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label fs-14">{{ 'nomenclature.educationalForm.shortName' | translate }}</label>
+                <nomenclature-select restUrl="Nomenclature/EducationalForm"
+                                     name="educationalForm"
+                                     [showSearchBox]="false"
+                                     [(ngModel)]="filter.educationalForm"
+                                     (keyPropertyChange)="filter.educationalFormId = $event"
+                                     [disabled]="filter.institutionSpecialityId > 0"
+                                     textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}">
+                </nomenclature-select>
+            </div>
+
+            <div *ngIf="!isGraduated"
+                 class="col-md-2">
+                <label class="form-label fs-14">{{ 'nomenclature.period.titleSingular' | translate }}</label>
+                <nomenclature-select restUrl="Nomenclature/Period"
+                                     name="period"
+                                     [showSearchBox]="false"
+                                     [(ngModel)]="filter.period"
+                                     (keyPropertyChange)="filter.periodId = $event"
+                                     textTemplate="{{translateService.currentLang === 'bg' ? '{name}' : '{nameAlt}'}}"
+                                     [disabled]="filter.studentStatus === personStudentStatusType.graduated || filter.studentStatus === personStudentStatusType.graduatedWithoutDiploma">
+                </nomenclature-select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fs-14">{{ 'nomenclature.studentStatus.name' | translate }}</label>
+                <i *ngIf="!isGraduated"
+                   class="fas fa-info-circle text-blue align-text-bottom ms-1"
+                   ngbTooltip="{{ 'rdpzsd.searchMenu.statusInfo' | translate }}"
+                   tooltipClass="primary-tooltip"></i>
+                <enum-select *ngIf="!isGraduated"
+                             [(ngModel)]="filter.studentStatus"
+                             (ngModelChange)="studentStatusChanged($event)"
+                             enumName="personStudentStatusType"
+                             [enumType]="personStudentStatusType"
+                             [showSearchBox]="false"></enum-select>
+
+                <enum-select *ngIf="isGraduated"
+                             [(ngModel)]="filter.studentStatus"
+                             enumName="personStudentStatusType"
+                             [enumType]="personGraduatedStudentStatusType"
+                             [showSearchBox]="false"
+                             [allowClear]="false"></enum-select>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <div class="d-flex">
+                <button *ngIf="searchResult.result.length > 0"
+                        class="btn btn-primary btn-sm"
+                        (click)="getDataCount()">
+                    <i style="min-width: 15px" [ngClass]="[loadingDataCount ? 'fas fa-sync fa-spin' : 'fas fa-info']"></i>
+                </button>
+
+                <a *ngIf="!dataCount && searchResult.result?.length > 0" 
+                        [routerLink]="" 
+                        class="no-text-decoration cursor-pointer fs-18 ms-2 mt-p2" 
+                        (click)="getDataCount()">
+                    {{ 'root.results.number' | translate }} {{ 'root.results.records' | translate }}
+                </a>
+
+                <div *ngIf="dataCount != null"
+                     class="d-flex align-items-center ms-2">
+                    <label class="fs-18">
+                      <span *ngIf="!loadingData">
+                        {{ 'root.results.total' | translate }} {{dataCount | formatNumber}}
+                        {{ 'root.results.records' | translate }}
+                      </span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <sync-button btnClass="btn btn-primary btn-sm ms-3"
+                             text="root.buttons.search"
+                             [click]="getData"
+                             [clickParams]="[false, false]"
+                             [clickContext]="this"
+                             icon="fas fa-search">
+                </sync-button>
+
+                <sync-button btnClass="btn btn-outline-primary btn-sm ms-3"
+                             text="root.buttons.clear"
+                             [click]="clear"
+                             [clickContext]="this"
+                             icon="fas fa-trash">
+                </sync-button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-scrollable">
+    <table class="table table-bordered mt-4">
+        <thead class="table-light">
+            <tr>
+                <th class="col-1">{{ 'rdpzsd.personLot.uanShort' | translate }}</th>
+                <th class="col-3">{{ 'rdpzsd.searchMenu.student' | translate }}</th>
+                <th class="col-3">{{ 'rdpzsd.searchMenu.birthCountryAndCitizenship' | translate}}</th>
+                <th class="col-4">{{ 'rdpzsd.searchMenu.specialityInfo' | translate }}</th>
+                <th class="col-1 center-text-th">
+                    {{ 'root.results.actions' | translate }}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngIf="!loadingData; else loadingSection">
+                <ng-container *ngIf="searchResult.result && searchResult.result.length > 0; else noResults">
+                    <tr *ngFor="let person of searchResult.result">
+                        <td>
+                            <b>{{ person.uan }}</b>
+                        </td>
+                        <td>
+                            <div *ngIf="person.uin">
+                                {{ 'rdpzsd.personBasic.uin' | translate }} {{ person.uin }}
+                            </div>
+
+                            <div *ngIf="person.foreignerNumber">
+                                {{ 'rdpzsd.personBasic.foreignerNumber' | translate}} {{ person.foreignerNumber }}
+                            </div>
+
+                            <div *ngIf="person.personIdn">
+                                {{ 'rdpzsd.personBasic.idn' | translate }} {{ person.personIdn }}
+                            </div>
+
+                            <translate-field [entity]="person"
+                                             propertyName="fullName"
+                                             propertyNameAlt="fullNameAlt">
+                            </translate-field>
+                            <div>
+                                <a *ngIf="person.email && person.email.toLowerCase() !== migrationNoEmail.toLowerCase()" href="mailto:{{person.email}}">{{person.email}}</a>
+                                <span *ngIf="person.phoneNumber && person.phoneNumber !== migrationNoPhoneNumber">, тел.: {{person.phoneNumber}}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div *ngIf="person.birthCountry">
+                                {{ person.birthDate | date: 'dd.MM.yyyy' }}, <span
+                                      *ngIf="person.birthSettlement">{{translateService.currentLang === 'bg' ?
+                                    person.birthSettlement?.name : person.birthSettlement?.nameAlt}}, </span>
+                                {{translateService.currentLang === 'bg' ? person.birthCountry.name :
+                                person.birthCountry.nameAlt}}
+                            </div>
+                            <div *ngIf="person.citizenship">{{translateService.currentLang === 'bg' ?
+                                person.citizenship.name : person.citizenship.nameAlt}}
+                                <span *ngIf="person.secondCitizenship">, {{translateService.currentLang === 'bg' ?
+                                    person.secondCitizenship.name : person.secondCitizenship.nameAlt}}
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <ng-template *ngIf="person?.personSemesters"
+                                         ngFor
+                                         let-specialitySemester
+                                         [ngForOf]="person?.personSemesters"
+                                         let-i="index">
+                                <div *ngIf="specialitySemester?.studentStatus?.alias !== studentStatusGraduated; 
+                                        else graduatedStudent">
+                                    <span
+                                          [ngClass]="{'text-red': !filter.periodId 
+                                        && ((userDataService.isRsdUser() && specialitySemester?.institution?.id === userDataService?.userData?.institution?.id)
+                                            || userDataService.isEmsUser())
+                                        && periodNomenclatureResource.latestPeriod?.id !== specialitySemester?.period?.id}">
+                                        {{specialitySemester?.period?.year}}/{{specialitySemester?.period?.semester}}
+                                    </span>
+                                    -
+                                    <span>
+                                        ({{'enums.courseType.' + courseType[specialitySemester?.course] + 'Roman' |
+                                        translate}}/{{specialitySemester?.studentSemester}}),
+                                    </span>
+                                    <span [ngClass]="{'text-red': ((userDataService.isRsdUser() && specialitySemester?.institution?.id === userDataService?.userData?.institution?.id)
+                                            || userDataService.isEmsUser())
+                                        && specialitySemester?.studentStatus?.alias === studentStatusInterrupted,
+                                                    'text-green': ((userDataService.isRsdUser() && specialitySemester?.institution?.id === userDataService?.userData?.institution?.id)
+                                            || userDataService.isEmsUser())
+                                        && specialitySemester?.studentStatus?.alias === studentStatusActive}">
+                                        {{translateService.currentLang === 'bg' ?
+                                        specialitySemester?.studentStatus?.name?.toLowerCase() :
+                                        specialitySemester?.studentStatus?.nameAlt?.toLowerCase()}},
+                                    </span>
+                                    <span>
+                                        {{translateService.currentLang === 'bg' ?
+                                        specialitySemester.institution?.shortName :
+                                        specialitySemester.institution?.shortNameAlt}} -
+                                    </span>
+                                    <span>{{translateService.currentLang === 'bg' ? specialitySemester?.institutionSpeciality?.speciality?.name : specialitySemester?.institutionSpeciality?.speciality?.nameAlt}}</span><span *ngIf="person.facultyNumber && ((userDataService.isRsdUser() && specialitySemester.institution.id === userDataService.userData?.institution?.id) || userDataService.isEmsUser())">, ф.н.: {{ person.facultyNumber }}</span>
+                                </div>
+                                <ng-template #graduatedStudent>
+                                    <span *ngIf="specialitySemester.diplomaYear">
+                                        {{ specialitySemester?.diplomaYear }} - 
+                                    </span>
+                                    <span>
+                                        {{translateService.currentLang === 'bg' ?
+                                        specialitySemester?.studentStatus?.name?.toLowerCase() :
+                                        specialitySemester?.studentStatus?.nameAlt?.toLowerCase()}}
+                                    </span>
+                                    <span
+                                          *ngIf="specialitySemester?.studentEvent?.alias === studentEventGraduatedWithoutDiploma">
+                                        ({{translateService.currentLang === 'bg' ?
+                                        specialitySemester?.studentEvent?.name?.toLowerCase() :
+                                        specialitySemester?.studentEvent?.nameAlt?.toLowerCase()}})
+                                    </span>,
+                                    <span>
+                                        {{translateService.currentLang === 'bg' ?
+                                        specialitySemester.institution?.shortName :
+                                        specialitySemester.institution?.shortNameAlt}} -
+                                    </span>
+                                    <span>{{translateService.currentLang === 'bg' ? specialitySemester?.institutionSpeciality?.speciality?.name : specialitySemester?.institutionSpeciality?.speciality?.nameAlt}}</span>
+                                </ng-template>
+                            </ng-template>
+                        </td>
+                        <td class="center-text-td">
+                            <sync-button btnClass="btn btn-transperant btn-sm"
+                                         icon="fas fa-search"
+                                         [click]="getStudentLot"
+                                         [clickContext]="this"
+                                         [clickParams]="[person.uan, 'Student']">
+                            </sync-button>
+                        </td>
+                    </tr>
+                </ng-container>
+                <ng-template #noResults>
+                    <tr>
+                        <td colspan="5"
+                            class="col-12">
+                            <i>{{ 'root.results.noResults' | translate }}</i>
+                        </td>
+                    </tr>
+                </ng-template>
+            </ng-container>
+            <ng-template #loadingSection>
+                <tr>
+                    <td colspan="5"
+                        class="col-12">
+                        <loading-section></loading-section>
+                    </td>
+                </tr>
+            </ng-template>
+        </tbody>
+    </table>
+</div>
+
+<div *ngIf="searchResult.result 
+      && searchResult.result.length > 0 && searchResult.result.length === filter.limit"
+     class="d-flex flex-row-reverse mt-2">
+    <div class="btn-group">
+        <sync-button btnClass="btn btn-primary"
+                     text="root.buttons.loadMore"
+                     [click]="getData"
+                     [clickContext]="this"
+                     [clickParams]="[true, false]">
+        </sync-button>
+    </div>
+</div>

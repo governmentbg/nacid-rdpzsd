@@ -1,0 +1,33 @@
+<div class="d-flex justify-content-between align-items-end">
+  <label class="form-label {{fontSize}} collapsable-label"
+         [class.cursor-pointer]="!disabled"
+         [style.color]="!isCollapsed ? '#135496' : ''"
+         (click)="onToggle()">
+    <span *ngIf="!icon && !disabled"
+          class="fa fa-md heading-icon"
+          [class.fa-chevron-right]="isCollapsed && !disabled"
+          [class.fa-chevron-down]="!isCollapsed && !disabled"></span>
+    <span *ngIf="icon && !disabled"
+          class="{{icon}}"></span>
+    <strong>
+      {{ heading | translate }}
+      <span *ngIf="secondIcon">
+        <i class="{{secondIcon}}"
+           ngbTooltip="{{ngbTooltipClass}}"
+           tooltipClass="{{iconTooltipClass}}"></i>
+      </span>
+    </strong>
+  </label>
+
+  <div *ngIf="!isCollapsed"
+       class="btn-group d-flex justify-content-end"
+       (click)="$event.stopPropagation()">
+    <ng-content select="[buttons]"></ng-content>
+  </div>
+</div>
+
+<div class="mt-2"
+     #collapse="ngbCollapse"
+     [(ngbCollapse)]="isCollapsed">
+  <ng-content select="[body]"></ng-content>
+</div>

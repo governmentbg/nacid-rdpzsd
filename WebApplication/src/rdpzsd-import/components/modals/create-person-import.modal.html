@@ -1,0 +1,38 @@
+<div class="modal-header modal-header-background ft-upper">
+    <strong>
+        {{ 'rdpzsdImport.person.modalTitle' | translate }}
+    </strong>
+</div>
+<form #form="ngForm">
+    <div class="modal-body p-3">
+        <div class="row g-3">
+            <div class="col-md-12">
+                <label class="form-label fs-14">{{ 'rdpzsdImport.file' | translate }}</label>
+                <file-upload name="importFile"
+                             fileStorageChildUrld="PersonImportFileUpload"
+                             inputGroupClass=""
+                             btnClass="btn-primary btn-sm ms-2"
+                             [(ngModel)]="personImport.importFile"
+                             fileFormat=".txt"
+                             [required]="true"
+                             [disabled]="!configuration.enableFullFunctionality"></file-upload>
+            </div>
+        </div>
+
+        <div class="mt-4 btn-group d-flex flex-row-reverse">
+            <sync-button btnClass="btn btn-outline-primary btn-sm ms-2"
+                         icon="fas fa-ban"
+                         text="root.buttons.cancel"
+                         [clickContext]="this"
+                         [click]="cancel">
+            </sync-button>
+
+            <sync-button btnClass="btn btn-primary btn-sm"
+                         text="root.buttons.sendForValidation"
+                         [disabled]="form.invalid"
+                         [clickContext]="this"
+                         [click]="save">
+            </sync-button>
+        </div>
+    </div>
+</form>

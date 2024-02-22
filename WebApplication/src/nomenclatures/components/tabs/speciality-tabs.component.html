@@ -1,0 +1,28 @@
+<div class="container">
+    <nav ngbNav
+         #nav="ngbNav"
+         [(activeId)]="activeTab"
+         class="nav-tabs">
+      <ng-container ngbNavItem="Speciality">
+        <a ngbNavLink>{{ 'nomenclature.speciality.title' | translate }}</a>
+        <ng-template ngbNavContent>
+          <institution-speciality-search></institution-speciality-search>
+        </ng-template>
+      </ng-container>
+      <ng-container ngbNavItem="Doctoral">
+        <a ngbNavLink>{{ 'nomenclature.doctoral.title' | translate }}</a>
+        <ng-template ngbNavContent>
+          <institution-doctoral-search></institution-doctoral-search>
+        </ng-template>
+      </ng-container>
+      <ng-container ngbNavItem="ResearchArea">
+        <a ngbNavLink>{{'nomenclature.researchArea.nameMultiple' | translate}}</a>
+        <ng-template ngbNavContent>
+          <research-area-search></research-area-search>
+        </ng-template>
+      </ng-container>
+    </nav>
+  
+    <div [ngbNavOutlet]="nav"
+         class="mt-2"></div>
+  </div>
